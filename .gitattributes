@@ -1,0 +1,11 @@
+* -text
+*.md text eol=native
+.gitattributes text eol=native
+.gitignore text eol=native
+LICENSE text eol=native
+
+*.h text eol=native
+*.cs text eol=native
+*.cpp text eol=native
+
+*.uplugin text eol=native
