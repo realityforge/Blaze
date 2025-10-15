@@ -1,0 +1,90 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include "Blaze/BlazePrimaryLayout.h"
+#include "Blaze/BlazeFunctionLibrary.h"
+#include "Blaze/BlazeLogging.h"
+#include "CommonActivatableWidget.h"
+#include "Engine/AssetManager.h"
+#include "Engine/StreamableManager.h"
+#include "Widgets/CommonActivatableWidgetContainer.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(BlazePrimaryLayout)
+
+UBlazePrimaryLayout::UBlazePrimaryLayout(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {}
+
+void UBlazePrimaryLayout::RegisterLayer(const FGameplayTag LayerTag, UCommonActivatableWidgetContainerBase* LayerWidget)
+{
+    if (!IsDesignTime())
+    {
+        LayerWidget->SetTransitionDuration(0.0);
+        Layers.Add(LayerTag, LayerWidget);
+    }
+}
+
+TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_Internal(
+    const FGameplayTag& LayerName,
+    const bool bSuspendInputUntilComplete,
+    const TSoftClassPtr<UCommonActivatableWidget>& WidgetClass,
+    TFunction<void(EBlazePushWidgetToLayerState, UCommonActivatableWidget*)> CallbackFunc)
+{
+    static const FName NAME_PushWidgetToLayer("PushWidgetToLayer");
+    const auto SuspendInputToken = bSuspendInputUntilComplete
+        ? UBlazeFunctionLibrary::SuspendInputForPlayer(GetOwningPlayer(), NAME_PushWidgetToLayer)
+        : NAME_None;
+
+    auto Handle = UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
+        WidgetClass.ToSoftObjectPath(),
+        FStreamableDelegate::CreateWeakLambda(this, [this, LayerName, WidgetClass, CallbackFunc, SuspendInputToken] {
+            UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
+
+            const auto Widget = PushWidgetToLayer<UCommonActivatableWidget>(
+                LayerName,
+                WidgetClass.Get(),
+                [CallbackFunc](auto& WidgetToInit) {
+                    CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
+                });
+
+            CallbackFunc(EBlazePushWidgetToLayerState::AfterPush, Widget);
+        }));
+
+    Handle->BindCancelDelegate(FStreamableDelegate::CreateWeakLambda(this, [this, CallbackFunc, SuspendInputToken]() {
+        UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
+        CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
+    }));
+
+    return Handle;
+}
+
+void UBlazePrimaryLayout::RemoveWidgetFromLayer(const FGameplayTag LayerName,
+                                                UCommonActivatableWidget* ActivatableWidget) const
+{
+    if (const auto Layer = GetLayer(LayerName))
+    {
+        Layer->RemoveWidget(*ActivatableWidget);
+    }
+    else
+    {
+        UE_LOGFMT(LogBlaze,
+                  Warning,
+                  "RemoveWidgetFromLayer((LayerName=[{LayerName}] ActivatableWidget=[{ActivatableWidget}]) "
+                  "ignored as no such Layer",
+                  LayerName.GetTagName(),
+                  GetNameSafe(ActivatableWidget));
+    }
+}
+
+UCommonActivatableWidgetContainerBase* UBlazePrimaryLayout::GetLayer(const FGameplayTag LayerName) const
+{
+    return Layers.FindRef(LayerName);
+}
