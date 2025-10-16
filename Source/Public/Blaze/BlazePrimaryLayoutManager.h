@@ -60,7 +60,8 @@ struct FPrimaryLayoutMapping
  * local players. It serves as an interface between local player instances and their respective
  * UI components.
  *
- * The class is abstract and it is expected that a subclass will be defined that overrides various template methods.
+ * The class is abstract and it is expected that a subclass will be defined that MUST override CreatePrimaryLayout()
+ * and may override any of the other template methods.
  */
 UCLASS(MinimalAPI, Abstract, Blueprintable, Within = BlazeSubsystem)
 class UBlazePrimaryLayoutManager : public UObject

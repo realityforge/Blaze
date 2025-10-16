@@ -23,11 +23,11 @@ class UBlazePrimaryLayoutManager;
 class UObject;
 
 /**
- * This manager is intended to be replaced by whatever your game needs to
- * actually create, so this class is abstract to prevent it from being created.
+ * @brief The subsystem manages the PrimaryLayoutManager.
  *
- * If you just need the basic functionality you will start by sublcassing this
- * subsystem in your own game.
+ * The Subsystem should be subclassed and the ShouldCreateSubsystem MUST be overriden to
+ * return true. The application may also override other methods to provide additional
+ * application-specific functionality.
  */
 UCLASS(MinimalAPI, Abstract, Config = Game)
 class UBlazeSubsystem : public UGameInstanceSubsystem
@@ -41,7 +41,7 @@ public:
     /**
      * Determines whether the subsystem should be created based on specific conditions.
      *
-     * This method returns false and is expected to be overriden to return true in derived classes.
+     * This method returns false and MUST be overriden to return true in derived classes.
      *
      * @return True to create the subsystem else false.
      */
