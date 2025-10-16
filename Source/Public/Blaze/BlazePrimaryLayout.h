@@ -101,12 +101,6 @@ protected:
 
 private:
     /**
-     * Handles the management of input suspension tokens, which are used
-     * to temporarily disable or suspend user input in certain contexts or workflows.
-     */
-    TArray<FName> SuspendInputTokens;
-
-    /**
      * A mapping that records registered layers for the primary layout.
      * Layers are identified by a `FGameplayTag` and represented by a `UCommonActivatableWidgetContainerBase` object.
      */
