@@ -131,7 +131,7 @@ void UBlazePrimaryLayoutManager::AddPrimaryLayoutToViewport(ULocalPlayer* LocalP
     UE_LOGFMT(LogBlaze,
               Log,
               "[{LayoutManager}]: Adding the primary layout [{PrimaryLayout}] "
-              "from the viewport for the player [{LocalPlayer}](ControllerId={ControllerId}). "
+              "to the viewport for the player [{LocalPlayer}](ControllerId={ControllerId}). "
               "World=[{WorldName}]",
               GetName(),
               GetNameSafe(Layout),
