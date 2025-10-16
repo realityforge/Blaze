@@ -117,6 +117,8 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
 void UBlazePrimaryLayout::RemoveWidgetFromLayer(const FGameplayTag LayerName,
                                                 UCommonActivatableWidget* ActivatableWidget) const
 {
+    check(LayerName.IsValid());
+    check(ActivatableWidget);
     if (const auto Layer = GetLayer(LayerName))
     {
         Layer->RemoveWidget(*ActivatableWidget);
@@ -136,5 +138,6 @@ void UBlazePrimaryLayout::RemoveWidgetFromLayer(const FGameplayTag LayerName,
 
 UCommonActivatableWidgetContainerBase* UBlazePrimaryLayout::GetLayer(const FGameplayTag LayerName) const
 {
+    check(LayerName.IsValid());
     return Layers.FindRef(LayerName);
 }
