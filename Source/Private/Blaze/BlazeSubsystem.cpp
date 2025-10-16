@@ -139,8 +139,8 @@ void UBlazeSubsystem::SwitchToPrimaryLayoutManager(UBlazePrimaryLayoutManager* I
                   Log,
                   "SwitchToPrimaryLayoutManager - [{Name}] is switching to PrimaryLayoutManager [{Old}] from [{New}]",
                   GetName(),
-                  GetNameSafe(InPrimaryLayoutManager),
-                  GetNameSafe(PrimaryLayoutManager));
+                  GetNameSafe(PrimaryLayoutManager),
+                  GetNameSafe(InPrimaryLayoutManager));
         if (PrimaryLayoutManager)
         {
             OnSwitchOutPrimaryLayoutManager(PrimaryLayoutManager);
