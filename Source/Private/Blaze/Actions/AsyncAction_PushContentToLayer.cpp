@@ -40,7 +40,7 @@ UAsyncAction_PushContentToLayer::PushContentToLayerAsync(APlayerController* Play
     }
     else if (!LayerName.IsValid())
     {
-        FFrame::KismetExecutionMessage(TEXT("PushContentToLayer was supplied an invalid LayerName"),
+        FFrame::KismetExecutionMessage(TEXT("PushContentToLayerAsync was supplied an invalid LayerName"),
                                        ELogVerbosity::Error);
         return nullptr;
     }
