@@ -91,17 +91,30 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
     auto Handle = UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
         WidgetClass.ToSoftObjectPath(),
         FStreamableDelegate::CreateWeakLambda(this, [this, LayerName, WidgetClass, CallbackFunc, SuspendInputToken] {
-            if (const auto ResolvedWidgetClass = WidgetClass.Get())
+            if (const auto ResolvedClass = WidgetClass.Get())
             {
                 UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
-                const auto Widget = PushWidgetToLayer<UCommonActivatableWidget>(
-                    LayerName,
-                    ResolvedWidgetClass,
-                    [CallbackFunc](auto& WidgetToInit) {
-                        CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
-                    });
-
-                CallbackFunc(EBlazePushWidgetToLayerState::AfterPush, Widget);
+                const TFunctionRef<void(UCommonActivatableWidget&)> Func = [CallbackFunc](auto& WidgetToInit) {
+                    CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
+                };
+                if (const auto Widget = PushWidgetToLayer<UCommonActivatableWidget>(LayerName, ResolvedClass, Func))
+                {
+                    CallbackFunc(EBlazePushWidgetToLayerState::AfterPush, Widget);
+                }
+                else
+                {
+                    UE_LOGFMT(LogBlaze,
+                              Warning,
+                              "PushWidgetToLayerAsync"
+                              "((Layout=[{Layout}] Layer=[{LayerName}] WidgetClass=[{WidgetClass}])) "
+                              "failed because the layer was not available or widget creation failed. "
+                              "World=[{WorldName}]",
+                              GetName(),
+                              LayerName.GetTagName(),
+                              GetNameSafe(ResolvedClass),
+                              GetNameSafe(GetWorld()));
+                    CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
+                }
             }
             else
             {
