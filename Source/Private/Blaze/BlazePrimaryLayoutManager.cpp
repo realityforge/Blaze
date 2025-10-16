@@ -172,7 +172,7 @@ void UBlazePrimaryLayoutManager::RemovePrimaryLayoutFromViewport(ULocalPlayer* L
         if (Widget.IsValid())
         {
             UE_LOGFMT(LogBlaze,
-                      Log,
+                      Warning,
                       "[{LayoutManager}]: The primary layout [{PrimaryLayout}] has been removed"
                       "from the viewport for the player [{LocalPlayer}](ControllerId={ControllerId}) "
                       "but references to the underlying widget still exist. "
