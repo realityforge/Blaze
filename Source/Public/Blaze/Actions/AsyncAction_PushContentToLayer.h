@@ -38,6 +38,24 @@ public:
     BLAZE_API virtual void Cancel() override;
 
     /**
+     * Event invoked after the widget has been initialized and before pushed onto the layer.
+     */
+    UPROPERTY(BlueprintAssignable)
+    FPushContentToLayerAsyncSignature OnInitialize;
+
+    /**
+     * Event invoked after the widget has been pushed onto the layer.
+     */
+    UPROPERTY(BlueprintAssignable)
+    FPushContentToLayerAsyncSignature AfterPush;
+
+    /**
+     * Event invoked if the push operation has been canceled.
+     */
+    UPROPERTY(BlueprintAssignable)
+    FPushContentToLayerAsyncSignature OnCancelled;
+
+    /**
      * Asynchronously creates an action to push a specified widget onto a UI layer.
      *
      * @param PlayerController The player controller associated with this operation. Must not be null.
@@ -59,24 +77,6 @@ public:
                             bool bSuspendInputUntilComplete = true);
 
 private:
-    /**
-     * Event invoked after the widget has been initialized and before pushed onto the layer.
-     */
-    UPROPERTY(BlueprintAssignable)
-    FPushContentToLayerAsyncSignature OnInitialize;
-
-    /**
-     * Event invoked after the widget has been pushed onto the layer.
-     */
-    UPROPERTY(BlueprintAssignable)
-    FPushContentToLayerAsyncSignature AfterPush;
-
-    /**
-     * Event invoked if the push operation has been canceled.
-     */
-    UPROPERTY(BlueprintAssignable)
-    FPushContentToLayerAsyncSignature OnCancelled;
-
     TWeakObjectPtr<APlayerController> PlayerController{ nullptr };
 
     FGameplayTag LayerName{ FGameplayTag::EmptyTag };
