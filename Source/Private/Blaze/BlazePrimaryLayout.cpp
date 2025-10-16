@@ -105,6 +105,7 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
             }
             else
             {
+                UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
                 CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
             }
         }));
