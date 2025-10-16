@@ -26,6 +26,7 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BlazeFunctionLibrary)
 
 // Running counter so we can create a unique name for a SuspendToken.
+// This variable is not synchronized as it is only accessed from the GameThread.
 // See SuspendInputForPlayer
 static int32 InputSuspensions{ 0 };
 
