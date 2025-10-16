@@ -135,7 +135,7 @@ protected:
     BLAZE_API virtual int GetAddLayoutToPlayerScreenZOrder(ULocalPlayer* LocalPlayer);
 
     /** The Default ZOrder when adding layouts to the player's screen. */
-    constexpr int DefaultZOrder{ 1000 };
+    static constexpr int DefaultZOrder{ 1000 };
 
 private:
     UPROPERTY(Transient)
