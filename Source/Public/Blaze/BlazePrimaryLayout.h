@@ -26,8 +26,11 @@ struct FStreamableHandle;
  */
 enum class EBlazePushWidgetToLayerState : uint8
 {
+    // State when the widget push operation is canceled or the Widget Class failed to resolve.
     Canceled,
+    // State after the widget has been initialized and before pushed onto the layer.
     Initialize,
+    // State after the widget has been pushed onto the layer.
     AfterPush
 };
 
