@@ -46,16 +46,22 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
     auto Handle = UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
         WidgetClass.ToSoftObjectPath(),
         FStreamableDelegate::CreateWeakLambda(this, [this, LayerName, WidgetClass, CallbackFunc, SuspendInputToken] {
-            UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
+            if (const auto ResolvedWidgetClass = WidgetClass.Get())
+            {
+                UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
+                const auto Widget = PushWidgetToLayer<UCommonActivatableWidget>(
+                    LayerName,
+                    ResolvedWidgetClass,
+                    [CallbackFunc](auto& WidgetToInit) {
+                        CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
+                    });
 
-            const auto Widget = PushWidgetToLayer<UCommonActivatableWidget>(
-                LayerName,
-                WidgetClass.Get(),
-                [CallbackFunc](auto& WidgetToInit) {
-                    CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
-                });
-
-            CallbackFunc(EBlazePushWidgetToLayerState::AfterPush, Widget);
+                CallbackFunc(EBlazePushWidgetToLayerState::AfterPush, Widget);
+            }
+            else
+            {
+                CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
+            }
         }));
 
     Handle->BindCancelDelegate(FStreamableDelegate::CreateWeakLambda(this, [this, CallbackFunc, SuspendInputToken]() {
