@@ -78,7 +78,7 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
                       Error,
                       "PushContentToLayer{Type}"
                       "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]) "
-                      "failed as LocalPlayer has no PrimaryLayout",
+                      "failed as unable to load WidgetClass.",
                       bAsync ? "Async" : "",
                       GetNameSafe(LocalPlayer),
                       LayerName.GetTagName(),
