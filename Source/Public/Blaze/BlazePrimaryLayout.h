@@ -96,6 +96,21 @@ public:
      */
     BLAZE_API UCommonActivatableWidgetContainerBase* GetLayer(const FGameplayTag LayerName) const;
 
+    /**
+     * Retrieves the widget container associated with the specified gameplay layer.
+     *
+     * Uses checked cast to ensure that it is present.
+     *
+     * @param LayerName The gameplay tag identifying the desired layer.
+     * @return A pointer to the widget container corresponding to the provided layer name.
+     */
+    FORCEINLINE UCommonActivatableWidgetContainerBase* GetLayerChecked(const FGameplayTag LayerName) const
+    {
+        const auto Layer = GetLayer(LayerName);
+        check(Layer);
+        return Layer;
+    }
+
 protected:
     /** Register a layer that widgets can be pushed onto. */
     UFUNCTION(BlueprintCallable, Category = "Blaze")
@@ -153,6 +168,6 @@ T* UBlazePrimaryLayout::PushWidgetToLayer(const FGameplayTag LayerName,
 {
     static_assert(TIsDerivedFrom<T, UCommonActivatableWidget>::IsDerived,
                   "Template type T must be derived from UCommonActivatableWidget");
-    const auto Layer = GetLayer(LayerName);
-    return Layer ? Layer->AddWidget<T>(const_cast<UClass*>(WidgetClass), InitInstanceFunc) : nullptr;
+    const auto Layer = GetLayerChecked(LayerName);
+    return Layer->AddWidget<T>(const_cast<UClass*>(WidgetClass), InitInstanceFunc);
 }
