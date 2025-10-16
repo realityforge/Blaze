@@ -51,7 +51,10 @@ void UBlazePrimaryLayout::BP_RegisterLayer(const FGameplayTag LayerTag,
                                             "a name that already exists"),
                                        ELogVerbosity::Error);
 #else
-        UE_LOGFMT(LogBlaze, Error, "BP_RegisterLayer was supplied an invalid LayerWidget");
+        UE_LOGFMT(LogBlaze,
+                  Error,
+                  "BP_RegisterLayer attempted to register a Layer with "
+                  "a name that already exists");
 #endif
     }
     else

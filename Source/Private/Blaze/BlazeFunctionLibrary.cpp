@@ -59,9 +59,11 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
         UE_LOGFMT(LogBlaze,
                   Log,
                   "PushContentToLayer"
-                  "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]). "
+                  "(LocalPlayer=[{LocalPlayer}](ControllerId={ControllerId}) "
+                  "LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]). "
                   "World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
+                  LocalPlayer ? LocalPlayer->GetControllerId() : -1,
                   LayerName.GetTagName(),
                   GetNameSafe(ResolvedWidgetClass),
                   GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
@@ -73,9 +75,11 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
         UE_LOGFMT(LogBlaze,
                   Error,
                   "PushContentToLayer"
-                  "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]) "
+                  "(LocalPlayer=[{LocalPlayer}](ControllerId={ControllerId}) "
+                  "LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]) "
                   "failed as LocalPlayer has no PrimaryLayout. World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
+                  LocalPlayer ? LocalPlayer->GetControllerId() : -1,
                   LayerName.GetTagName(),
                   GetNameSafe(ResolvedWidgetClass),
                   GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
@@ -138,10 +142,11 @@ void UBlazeFunctionLibrary::PopContentFromLayer(const FGameplayTag LayerName,
                 UE_LOGFMT(LogBlaze,
                           Display,
                           "PopContentFromLayer(ActivatableWidget=[{ActivatableWidget}]) "
-                          "failed as LocalPlayer=[{LocalPlayer}] has no PrimaryLayout. "
+                          "failed as LocalPlayer=[{LocalPlayer}](ControllerId={ControllerId}) has no PrimaryLayout. "
                           "World=[{WorldName}]",
                           GetNameSafe(ActivatableWidget),
                           GetNameSafe(LocalPlayer),
+                          LocalPlayer ? LocalPlayer->GetControllerId() : -1,
                           GetNameSafe(ActivatableWidget ? ActivatableWidget->GetWorld() : nullptr));
             }
         }
@@ -194,9 +199,11 @@ FName UBlazeFunctionLibrary::SuspendInputForPlayer(const ULocalPlayer* LocalPlay
     {
         UE_LOGFMT(LogBlaze,
                   Warning,
-                  "SuspendInputForPlayer((LocalPlayer=[{LocalPlayer}] SuspendReasonBase=[{SuspendReasonBase}]) "
+                  "SuspendInputForPlayer((LocalPlayer=[{LocalPlayer}](ControllerId={ControllerId}) "
+                  "SuspendReasonBase=[{SuspendReasonBase}]) "
                   "failed as unable to locate CommonInputSubsystem. World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
+                  LocalPlayer ? LocalPlayer->GetControllerId() : -1,
                   SuspendReasonBase,
                   GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
         return NAME_None;
@@ -222,9 +229,11 @@ void UBlazeFunctionLibrary::ResumeInputForPlayer(const ULocalPlayer* LocalPlayer
         {
             UE_LOGFMT(LogBlaze,
                       Warning,
-                      "ResumeInputForPlayer((LocalPlayer=[{LocalPlayer}] SuspendToken=[{SuspendToken}]) "
+                      "ResumeInputForPlayer((LocalPlayer=[{LocalPlayer}](ControllerId={ControllerId}) "
+                      "SuspendToken=[{SuspendToken}]) "
                       "failed as unable to locate CommonInputSubsystem. World=[{WorldName}]",
                       GetNameSafe(LocalPlayer),
+                      LocalPlayer ? LocalPlayer->GetControllerId() : -1,
                       SuspendToken,
                       GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
         }
@@ -233,9 +242,11 @@ void UBlazeFunctionLibrary::ResumeInputForPlayer(const ULocalPlayer* LocalPlayer
     {
         UE_LOGFMT(LogBlaze,
                   Warning,
-                  "ResumeInputForPlayer((LocalPlayer=[{LocalPlayer}] SuspendToken=[{SuspendToken}]) "
+                  "ResumeInputForPlayer((LocalPlayer=[{LocalPlayer}](ControllerId={ControllerId}) "
+                  "SuspendToken=[{SuspendToken}]) "
                   "ignored as SuspendToken is invalid. World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
+                  LocalPlayer ? LocalPlayer->GetControllerId() : -1,
                   SuspendToken,
                   GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
     }
