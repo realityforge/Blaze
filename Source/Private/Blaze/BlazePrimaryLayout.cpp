@@ -78,9 +78,11 @@ void UBlazePrimaryLayout::RemoveWidgetFromLayer(const FGameplayTag LayerName,
         UE_LOGFMT(LogBlaze,
                   Warning,
                   "RemoveWidgetFromLayer((LayerName=[{LayerName}] ActivatableWidget=[{ActivatableWidget}]) "
-                  "ignored as no such Layer",
+                  "ignored as no such Layer. "
+                  "World=[{WorldName}]",
                   LayerName.GetTagName(),
-                  GetNameSafe(ActivatableWidget));
+                  GetNameSafe(ActivatableWidget),
+                  GetNameSafe(GetWorld()));
     }
 }
 

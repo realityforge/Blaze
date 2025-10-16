@@ -32,8 +32,10 @@ void UBlazePlayerControllerComponent::ReceivedPlayer()
                 UE_LOGFMT(LogBlaze,
                           Verbose,
                           "UBlazePlayerControllerComponent::ReceivedPlayer({Name}) "
-                          "registering LocalPlayer in BlazeSubsystem",
-                          Owner->GetName());
+                          "registering LocalPlayer in BlazeSubsystem. "
+                          "World=[{WorldName}]",
+                          Owner->GetName(),
+                          GetNameSafe(Subsystem->GetWorld()));
 
                 // The remove and then add pattern is used in case the controller component is dynamically
                 // added or removed from the controller and/or to support possession changes mid game. It also
@@ -46,8 +48,10 @@ void UBlazePlayerControllerComponent::ReceivedPlayer()
                 UE_LOGFMT(LogBlaze,
                           Error,
                           "UBlazePlayerControllerComponent::ReceivedPlayer({Name}) "
-                          "unable to locate BlazeSubsystem. Misconfigured application.",
-                          Owner->GetName());
+                          "unable to locate BlazeSubsystem. Misconfigured application. "
+                          "World=[{WorldName}]",
+                          Owner->GetName(),
+                          GetNameSafe(GetWorld()));
             }
         }
     }

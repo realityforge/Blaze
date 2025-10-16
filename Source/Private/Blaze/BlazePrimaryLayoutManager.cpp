@@ -53,10 +53,13 @@ void UBlazePrimaryLayoutManager::TryCreateAndAddPrimaryLayoutToViewport(ULocalPl
             UE_LOGFMT(LogBlaze,
                       Log,
                       "[{PrimaryLayoutManager}] did not add PrimaryLayout {PrimaryLayout} "
-                      "to player [{LocalPlayer}] as it was already added",
+                      "to player [{LocalPlayer}](ControllerId={ControllerId}) as it was already added. "
+                      "World=[{WorldName}]",
                       GetName(),
                       GetNameSafe(Entry->PrimaryLayout),
-                      GetNameSafe(LocalPlayer));
+                      GetNameSafe(LocalPlayer),
+                      LocalPlayer ? LocalPlayer->GetControllerId() : -1,
+                      GetNameSafe(GetWorld()));
         }
     }
     else if (const auto PlayerController = LocalPlayer->GetPlayerController(GetWorld()))
@@ -70,39 +73,51 @@ void UBlazePrimaryLayoutManager::TryCreateAndAddPrimaryLayoutToViewport(ULocalPl
         {
             UE_LOGFMT(LogBlaze,
                       Error,
-                      "[{PrimaryLayoutManager}] failed to create PrimaryLayout for player [{LocalPlayer}]",
+                      "[{PrimaryLayoutManager}] failed to create PrimaryLayout for player [{LocalPlayer}]"
+                      "(ControllerId={ControllerId}) in World=[{WorldName}]",
                       GetName(),
-                      GetNameSafe(LocalPlayer));
+                      GetNameSafe(LocalPlayer),
+                      LocalPlayer ? LocalPlayer->GetControllerId() : -1,
+                      GetNameSafe(GetWorld()));
         }
     }
 }
 
 void UBlazePrimaryLayoutManager::NotifyPlayerAdded(ULocalPlayer* LocalPlayer)
 {
-    TryCreateAndAddPrimaryLayoutToViewport(LocalPlayer);
+    if (ensureAlways(LocalPlayer))
+    {
+        TryCreateAndAddPrimaryLayoutToViewport(LocalPlayer);
+    }
 }
 
 void UBlazePrimaryLayoutManager::NotifyPlayerRemoved(ULocalPlayer* LocalPlayer)
 {
-    if (const auto Layout = PrimaryLayouts.FindByKey(LocalPlayer))
+    if (ensureAlways(LocalPlayer))
     {
-        RemovePrimaryLayoutFromViewport(LocalPlayer, Layout->PrimaryLayout);
-        Layout->bAddedToViewport = false;
+        if (const auto Layout = PrimaryLayouts.FindByKey(LocalPlayer))
+        {
+            RemovePrimaryLayoutFromViewport(LocalPlayer, Layout->PrimaryLayout);
+            Layout->bAddedToViewport = false;
+        }
     }
 }
 
 void UBlazePrimaryLayoutManager::NotifyPlayerDestroyed(ULocalPlayer* LocalPlayer)
 {
-    NotifyPlayerRemoved(LocalPlayer);
-    const auto EntryIndex = PrimaryLayouts.IndexOfByKey(LocalPlayer);
-    if (INDEX_NONE != EntryIndex)
+    if (ensureAlways(LocalPlayer))
     {
-        const auto Entry = PrimaryLayouts[EntryIndex].PrimaryLayout.Get();
+        NotifyPlayerRemoved(LocalPlayer);
+        const auto EntryIndex = PrimaryLayouts.IndexOfByKey(LocalPlayer);
+        if (INDEX_NONE != EntryIndex)
+        {
+            const auto Entry = PrimaryLayouts[EntryIndex].PrimaryLayout.Get();
 
-        PrimaryLayouts.RemoveAt(EntryIndex);
+            PrimaryLayouts.RemoveAt(EntryIndex);
 
-        RemovePrimaryLayoutFromViewport(LocalPlayer, Entry);
-        OnPrimaryLayoutReleased(LocalPlayer, Entry);
+            RemovePrimaryLayoutFromViewport(LocalPlayer, Entry);
+            OnPrimaryLayoutReleased(LocalPlayer, Entry);
+        }
     }
 }
 
@@ -116,10 +131,13 @@ void UBlazePrimaryLayoutManager::AddPrimaryLayoutToViewport(ULocalPlayer* LocalP
     UE_LOGFMT(LogBlaze,
               Log,
               "[{LayoutManager}]: Adding the primary layout [{PrimaryLayout}] "
-              "from the viewport for the player [{LocalPlayer}]",
+              "from the viewport for the player [{LocalPlayer}](ControllerId={ControllerId}). "
+              "World=[{WorldName}]",
               GetName(),
               GetNameSafe(Layout),
-              GetNameSafe(LocalPlayer));
+              GetNameSafe(LocalPlayer),
+              LocalPlayer ? LocalPlayer->GetControllerId() : -1,
+              GetNameSafe(GetWorld()));
 
     Layout->SetPlayerContext(FLocalPlayerContext(LocalPlayer));
     Layout->AddToPlayerScreen(GetAddLayoutToPlayerScreenZOrder(LocalPlayer));
@@ -143,21 +161,27 @@ void UBlazePrimaryLayoutManager::RemovePrimaryLayoutFromViewport(ULocalPlayer* L
         UE_LOGFMT(LogBlaze,
                   Log,
                   "[{LayoutManager}]: Removing the primary layout [{PrimaryLayout}] "
-                  "from the viewport for the player [{LocalPlayer}]",
+                  "from the viewport for the player [{LocalPlayer}](ControllerId={ControllerId}). "
+                  "World=[{WorldName}]",
                   GetName(),
                   GetNameSafe(Layout),
-                  GetNameSafe(LocalPlayer));
+                  GetNameSafe(LocalPlayer),
+                  LocalPlayer ? LocalPlayer->GetControllerId() : -1,
+                  GetNameSafe(GetWorld()));
         Layout->RemoveFromParent();
         if (Widget.IsValid())
         {
             UE_LOGFMT(LogBlaze,
                       Log,
                       "[{LayoutManager}]: The primary layout [{PrimaryLayout}] has been removed"
-                      "from the viewport for the player [{LocalPlayer}] but references to the "
-                      "underlying widget still exist.",
+                      "from the viewport for the player [{LocalPlayer}](ControllerId={ControllerId}) "
+                      "but references to the underlying widget still exist. "
+                      "World=[{WorldName}]",
                       GetName(),
                       GetNameSafe(Layout),
-                      GetNameSafe(LocalPlayer));
+                      GetNameSafe(LocalPlayer),
+                      LocalPlayer ? LocalPlayer->GetControllerId() : -1,
+                      GetNameSafe(GetWorld()));
         }
 
         OnPrimaryLayoutRemovedFromViewport(LocalPlayer, Layout);

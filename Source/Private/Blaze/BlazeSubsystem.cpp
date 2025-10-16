@@ -26,32 +26,40 @@ void UBlazeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         UE_LOGFMT(LogBlaze,
                   Log,
                   "[{Name}] is initializing but PrimaryLayoutManager=[{PrimaryLayoutManager}] "
-                  "already present. No need to recreate.",
+                  "already present. No need to recreate. "
+                  "World=[{WorldName}]",
                   GetName(),
-                  GetNameSafe(PrimaryLayoutManager));
+                  GetNameSafe(PrimaryLayoutManager),
+                  GetNameSafe(GetWorld()));
     }
     else if (PrimaryLayoutManagerClass.IsNull())
     {
         UE_LOGFMT(LogBlaze,
                   Error,
                   "[{Name}] attempting to initialize but "
-                  "PrimaryLayoutManagerClass is null. System misconfigured - skipping Initialize.",
-                  GetName());
+                  "PrimaryLayoutManagerClass is null. System misconfigured - skipping Initialize. "
+                  "World=[{WorldName}]",
+                  GetName(),
+                  GetNameSafe(GetWorld()));
     }
     else if (const auto Class = PrimaryLayoutManagerClass.LoadSynchronous())
     {
         UE_LOGFMT(LogBlaze,
                   Log,
-                  "[{Name}] is initializing. PrimaryLayoutManager=[{PrimaryLayoutManager}]",
+                  "[{Name}] is initializing. PrimaryLayoutManager=[{PrimaryLayoutManager}]. "
+                  "World=[{WorldName}]",
                   GetName(),
-                  GetNameSafe(Class));
+                  GetNameSafe(Class),
+                  GetNameSafe(GetWorld()));
         if (const auto NewPrimaryLayoutManager = NewObject<UBlazePrimaryLayoutManager>(this, Class))
         {
             UE_LOGFMT(LogBlaze,
                       Log,
-                      "[{Name}] created PrimaryLayoutManager=[{PrimaryLayoutManager}]",
+                      "[{Name}] created PrimaryLayoutManager=[{PrimaryLayoutManager}]. "
+                      "World=[{WorldName}]",
                       GetName(),
-                      GetNameSafe(NewPrimaryLayoutManager));
+                      GetNameSafe(NewPrimaryLayoutManager),
+                      GetNameSafe(GetWorld()));
 
             SwitchToPrimaryLayoutManager(NewPrimaryLayoutManager);
         }
@@ -60,9 +68,11 @@ void UBlazeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
             UE_LOGFMT(LogBlaze,
                       Error,
                       "[{Name}] failed to create PrimaryLayoutManager "
-                      "for class [{PrimaryLayoutManagerClass}]. Skipping initialization.",
+                      "for class [{PrimaryLayoutManagerClass}]. Skipping initialization. "
+                      "World=[{WorldName}]",
                       GetName(),
-                      GetNameSafe(Class));
+                      GetNameSafe(Class),
+                      GetNameSafe(GetWorld()));
             SwitchToPrimaryLayoutManager(nullptr);
         }
     }
@@ -71,9 +81,11 @@ void UBlazeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         UE_LOGFMT(LogBlaze,
                   Error,
                   "[{Name}] PrimaryLayoutManagerClass [{PrimaryLayoutManagerClass}] "
-                  "failed to load. Skipping Initialize.",
+                  "failed to load. Skipping Initialize. "
+                  "World=[{WorldName}]",
                   GetName(),
-                  PrimaryLayoutManagerClass.ToSoftObjectPath());
+                  PrimaryLayoutManagerClass.ToSoftObjectPath(),
+                  GetNameSafe(GetWorld()));
     }
 }
 
@@ -93,9 +105,11 @@ void UBlazeSubsystem::NotifyPlayerAdded(ULocalPlayer* LocalPlayer)
 {
     UE_LOGFMT(LogBlaze,
               Log,
-              "NotifyPlayerAdded - [{Name}] is adding LocalPlayer [{LocalPlayer}]",
+              "NotifyPlayerAdded - [{Name}] is adding LocalPlayer [{LocalPlayer}]. "
+              "World=[{WorldName}]",
               GetName(),
-              GetNameSafe(LocalPlayer));
+              GetNameSafe(LocalPlayer),
+              GetNameSafe(GetWorld()));
     if (ensure(LocalPlayer))
     {
         if (PrimaryLayoutManager)
@@ -109,9 +123,10 @@ void UBlazeSubsystem::NotifyPlayerRemoved(ULocalPlayer* LocalPlayer)
 {
     UE_LOGFMT(LogBlaze,
               Log,
-              "NotifyPlayerRemoved - [{Name}] is removing LocalPlayer [{LocalPlayer}]",
+              "NotifyPlayerRemoved - [{Name}] is removing LocalPlayer [{LocalPlayer}]. World=[{WorldName}]",
               GetName(),
-              GetNameSafe(LocalPlayer));
+              GetNameSafe(LocalPlayer),
+              GetNameSafe(GetWorld()));
     if (LocalPlayer && PrimaryLayoutManager)
     {
         PrimaryLayoutManager->NotifyPlayerRemoved(LocalPlayer);
@@ -122,9 +137,10 @@ void UBlazeSubsystem::NotifyPlayerDestroyed(ULocalPlayer* LocalPlayer)
 {
     UE_LOGFMT(LogBlaze,
               Log,
-              "NotifyPlayerDestroyed - [{Name}] is destroying LocalPlayer [{LocalPlayer}]",
+              "NotifyPlayerDestroyed - [{Name}] is destroying LocalPlayer [{LocalPlayer}]. World=[{WorldName}]",
               GetName(),
-              GetNameSafe(LocalPlayer));
+              GetNameSafe(LocalPlayer),
+              GetNameSafe(GetWorld()));
     if (LocalPlayer && PrimaryLayoutManager)
     {
         PrimaryLayoutManager->NotifyPlayerDestroyed(LocalPlayer);
@@ -137,10 +153,12 @@ void UBlazeSubsystem::SwitchToPrimaryLayoutManager(UBlazePrimaryLayoutManager* I
     {
         UE_LOGFMT(LogBlaze,
                   Log,
-                  "SwitchToPrimaryLayoutManager - [{Name}] is switching to PrimaryLayoutManager [{Old}] from [{New}]",
+                  "SwitchToPrimaryLayoutManager - [{Name}] is switching to PrimaryLayoutManager [{Old}] from [{New}]. "
+                  "World=[{WorldName}]",
                   GetName(),
                   GetNameSafe(PrimaryLayoutManager),
-                  GetNameSafe(InPrimaryLayoutManager));
+                  GetNameSafe(InPrimaryLayoutManager),
+                  GetNameSafe(GetWorld()));
         if (PrimaryLayoutManager)
         {
             OnSwitchOutPrimaryLayoutManager(PrimaryLayoutManager);

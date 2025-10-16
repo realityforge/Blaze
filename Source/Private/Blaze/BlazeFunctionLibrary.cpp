@@ -45,10 +45,11 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
                   Error,
                   "PushContentToLayer"
                   "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]) "
-                  "failed due to invalid parameters",
+                  "failed due to invalid parameters. World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
                   LayerName.GetTagName(),
-                  GetNameSafe(WidgetClass));
+                  GetNameSafe(WidgetClass),
+                  GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
         return nullptr;
     }
     else if (const auto Layout = GetPrimaryLayout(LocalPlayer))
@@ -56,10 +57,12 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
         UE_LOGFMT(LogBlaze,
                   Log,
                   "PushContentToLayer"
-                  "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}])",
+                  "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]). "
+                  "World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
                   LayerName.GetTagName(),
-                  GetNameSafe(WidgetClass));
+                  GetNameSafe(WidgetClass),
+                  GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
 
         return Layout->PushWidgetToLayer(LayerName, WidgetClass);
     }
@@ -69,10 +72,11 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
                   Error,
                   "PushContentToLayer"
                   "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]) "
-                  "failed as LocalPlayer has no PrimaryLayout",
+                  "failed as LocalPlayer has no PrimaryLayout. World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
                   LayerName.GetTagName(),
-                  GetNameSafe(WidgetClass));
+                  GetNameSafe(WidgetClass),
+                  GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
         return nullptr;
     }
 }
@@ -132,9 +136,11 @@ void UBlazeFunctionLibrary::PopContentFromLayer(const FGameplayTag LayerName,
                 UE_LOGFMT(LogBlaze,
                           Display,
                           "PopContentFromLayer(ActivatableWidget=[{ActivatableWidget}]) "
-                          "failed as LocalPlayer=[{LocalPlayer}] has no PrimaryLayout",
+                          "failed as LocalPlayer=[{LocalPlayer}] has no PrimaryLayout. "
+                          "World=[{WorldName}]",
                           GetNameSafe(ActivatableWidget),
-                          GetNameSafe(LocalPlayer));
+                          GetNameSafe(LocalPlayer),
+                          GetNameSafe(ActivatableWidget ? ActivatableWidget->GetWorld() : nullptr));
             }
         }
         else
@@ -142,8 +148,9 @@ void UBlazeFunctionLibrary::PopContentFromLayer(const FGameplayTag LayerName,
             UE_LOGFMT(LogBlaze,
                       Error,
                       "PopContentFromLayer(ActivatableWidget=[{ActivatableWidget}]) "
-                      "failed as widget has no OwningLocalPlayer.",
-                      GetNameSafe(ActivatableWidget));
+                      "failed as widget has no OwningLocalPlayer. World=[{WorldName}]",
+                      GetNameSafe(ActivatableWidget),
+                      GetNameSafe(ActivatableWidget ? ActivatableWidget->GetWorld() : nullptr));
         }
     }
     else
@@ -151,8 +158,9 @@ void UBlazeFunctionLibrary::PopContentFromLayer(const FGameplayTag LayerName,
         UE_LOGFMT(LogBlaze,
                   Error,
                   "PopContentFromLayer(ActivatableWidget=[{ActivatableWidget}]) "
-                  "failed as ActivatableWidget invalid",
-                  GetNameSafe(ActivatableWidget));
+                  "failed as ActivatableWidget invalid. World=[{WorldName}]",
+                  GetNameSafe(ActivatableWidget),
+                  GetNameSafe(ActivatableWidget ? ActivatableWidget->GetWorld() : nullptr));
     }
 }
 
@@ -185,9 +193,10 @@ FName UBlazeFunctionLibrary::SuspendInputForPlayer(const ULocalPlayer* LocalPlay
         UE_LOGFMT(LogBlaze,
                   Warning,
                   "SuspendInputForPlayer((LocalPlayer=[{LocalPlayer}] SuspendReasonBase=[{SuspendReasonBase}]) "
-                  "failed as unable to locate CommonInputSubsystem",
+                  "failed as unable to locate CommonInputSubsystem. World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
-                  SuspendReasonBase);
+                  SuspendReasonBase,
+                  GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
         return NAME_None;
     }
 }
@@ -212,9 +221,10 @@ void UBlazeFunctionLibrary::ResumeInputForPlayer(const ULocalPlayer* LocalPlayer
             UE_LOGFMT(LogBlaze,
                       Warning,
                       "ResumeInputForPlayer((LocalPlayer=[{LocalPlayer}] SuspendToken=[{SuspendToken}]) "
-                      "failed as unable to locate CommonInputSubsystem",
+                      "failed as unable to locate CommonInputSubsystem. World=[{WorldName}]",
                       GetNameSafe(LocalPlayer),
-                      SuspendToken);
+                      SuspendToken,
+                      GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
         }
     }
     else
@@ -222,8 +232,9 @@ void UBlazeFunctionLibrary::ResumeInputForPlayer(const ULocalPlayer* LocalPlayer
         UE_LOGFMT(LogBlaze,
                   Warning,
                   "ResumeInputForPlayer((LocalPlayer=[{LocalPlayer}] SuspendToken=[{SuspendToken}]) "
-                  "ignored as SuspendToken is invalid",
+                  "ignored as SuspendToken is invalid. World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
-                  SuspendToken);
+                  SuspendToken,
+                  GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
     }
 }
