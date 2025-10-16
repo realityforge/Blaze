@@ -26,7 +26,7 @@ UAsyncAction_PushContentToLayer::PushContentToLayerAsync(APlayerController* Play
                                                          const TSoftClassPtr<UCommonActivatableWidget> WidgetClass,
                                                          const bool bSuspendInputUntilComplete)
 {
-    if (nullptr == PlayerController)
+    if (!PlayerController)
     {
         FFrame::KismetExecutionMessage(TEXT("PushContentToLayerAsync was supplied a null PlayerController"),
                                        ELogVerbosity::Error);
