@@ -25,6 +25,8 @@ UBlazePrimaryLayout::UBlazePrimaryLayout(const FObjectInitializer& ObjectInitial
 
 void UBlazePrimaryLayout::RegisterLayer(const FGameplayTag LayerTag, UCommonActivatableWidgetContainerBase* LayerWidget)
 {
+    // Avoid attempting to add widgets during designer as it would make it
+    // hard to design in the editor if layers were being added
     if (!IsDesignTime())
     {
         LayerWidget->SetTransitionDuration(0.0);
