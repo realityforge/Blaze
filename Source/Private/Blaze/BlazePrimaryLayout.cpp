@@ -29,8 +29,11 @@ void UBlazePrimaryLayout::RegisterLayer(const FGameplayTag LayerTag, UCommonActi
     // hard to design in the editor if layers were being added
     if (!IsDesignTime())
     {
-        LayerWidget->SetTransitionDuration(0.0);
-        Layers.Add(LayerTag, LayerWidget);
+        if (ensureAlways(LayerWidget) && ensureAlways(LayerTag.IsValid()) && ensureAlways(!Layers.Contains(LayerTag)))
+        {
+            LayerWidget->SetTransitionDuration(0.0);
+            Layers.Add(LayerTag, LayerWidget);
+        }
     }
 }
 
