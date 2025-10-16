@@ -53,8 +53,10 @@ public:
     static BLAZE_API UBlazePrimaryLayout* GetPrimaryLayout(const ULocalPlayer* LocalPlayer);
 
     /**
-     * Pushes a specified widget class to a designated layer for a given local player by delegating to another method.
-     * This allows the management of UI content at various layers.
+     * Adds a widget to the specified UI layer synchronously.
+     *
+     * This call blocks until the widget class is fully loaded and added to the layer.
+     * For non-blocking, asynchronous loading, use the `UAsyncAction_PushContentToLayer` class instead.
      *
      * @param PlayerController The player controller representing the player.
      * @param LayerName The tag identifying the target layer to which the widget should be added.
@@ -76,22 +78,10 @@ public:
      * @param WidgetClass The class of the widget to be activated and added to the specified layer.
      * @return A pointer to the added widget instance upon successful execution, or nullptr if the process fails.
      */
-    static BLAZE_API UCommonActivatableWidget* PushContentToLayer(const ULocalPlayer* LocalPlayer,
-                                                                  FGameplayTag LayerName,
-                                                                  TSubclassOf<UCommonActivatableWidget> WidgetClass);
-
-    /**
-     * Pushes a streamed widget to a specific content layer for the given local player.
-     * The widget is specified as a soft class pointer and will be loaded and displayed
-     * within the identified layer.
-     *
-     * @param LocalPlayer The local player.
-     * @param LayerName The tag identifying the target layer to which the widget should be added.
-     * @param WidgetClass The soft class pointer to the widget that should be streamed into the layer.
-     */
-    static BLAZE_API void PushContentToLayerAsync(const ULocalPlayer* LocalPlayer,
-                                                  FGameplayTag LayerName,
-                                                  TSoftClassPtr<UCommonActivatableWidget> WidgetClass);
+    static BLAZE_API UCommonActivatableWidget*
+    PushContentToLayer(const ULocalPlayer* LocalPlayer,
+                       const FGameplayTag LayerName,
+                       const TSubclassOf<UCommonActivatableWidget> WidgetClass);
 
     /**
      * Removes a specified activatable widget from the specified UI layer it is currently displayed within.
@@ -158,11 +148,6 @@ private:
     static void ResumeInputForPlayer(const ULocalPlayer* LocalPlayer, FName SuspendToken);
 
     static UBlazePrimaryLayoutManager* GetPrimaryLayoutManager(const UGameInstance* GameInstance);
-
-    static UCommonActivatableWidget* PushContentToLayer(const ULocalPlayer* LocalPlayer,
-                                                        const FGameplayTag LayerName,
-                                                        const TSoftClassPtr<UCommonActivatableWidget> WidgetClass,
-                                                        const bool bAsync);
 
     friend class UBlazePrimaryLayout;
 };

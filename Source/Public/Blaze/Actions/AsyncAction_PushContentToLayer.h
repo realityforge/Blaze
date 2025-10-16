@@ -56,7 +56,10 @@ public:
     FPushContentToLayerAsyncSignature OnCancelled;
 
     /**
-     * Asynchronously creates an action to push a specified widget onto a UI layer.
+     * Loads and adds a widget to the specified UI layer asynchronously.
+     *
+     * This call returns immediately and does not block while the widget class is loaded.
+     * Use the return value to add callbacks for initialization, completion, or cancellation of the load operation.
      *
      * @param PlayerController The player controller associated with this operation. Must not be null.
      * @param LayerName The gameplay tag specifying the UI layer to place the widget on. Must be valid.

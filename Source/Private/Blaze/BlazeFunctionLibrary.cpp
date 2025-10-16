@@ -37,66 +37,42 @@ static ULocalPlayer* GetLocalPlayerFromController(const APlayerController* Playe
 UCommonActivatableWidget*
 UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
                                           const FGameplayTag LayerName,
-                                          const TSoftClassPtr<UCommonActivatableWidget> WidgetClass,
-                                          const bool bAsync)
+                                          const TSubclassOf<UCommonActivatableWidget> WidgetClass)
 {
-    if (!LocalPlayer || WidgetClass.IsNull() || !LayerName.IsValid())
+    if (!LocalPlayer || !WidgetClass.Get() || !LayerName.IsValid())
     {
         UE_LOGFMT(LogBlaze,
                   Error,
-                  "PushContentToLayer{Type}"
+                  "PushContentToLayer"
                   "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]) "
                   "failed due to invalid parameters",
-                  bAsync ? "Async" : "",
                   GetNameSafe(LocalPlayer),
                   LayerName.GetTagName(),
-                  WidgetClass.ToString());
+                  GetNameSafe(WidgetClass));
         return nullptr;
     }
     else if (const auto Layout = GetPrimaryLayout(LocalPlayer))
     {
         UE_LOGFMT(LogBlaze,
                   Log,
-                  "PushContentToLayer{Type}"
+                  "PushContentToLayer"
                   "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}])",
-                  bAsync ? "Async" : "",
                   GetNameSafe(LocalPlayer),
                   LayerName.GetTagName(),
-                  WidgetClass.ToString());
-        if (bAsync)
-        {
-            Layout->PushWidgetToLayerAsync(LayerName, true, WidgetClass);
-            return nullptr;
-        }
-        else if (const auto LoadedClass = WidgetClass.LoadSynchronous())
-        {
-            return Layout->PushWidgetToLayer(LayerName, TSubclassOf<UCommonActivatableWidget>(LoadedClass));
-        }
-        else
-        {
-            UE_LOGFMT(LogBlaze,
-                      Error,
-                      "PushContentToLayer{Type}"
-                      "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]) "
-                      "failed as unable to load WidgetClass.",
-                      bAsync ? "Async" : "",
-                      GetNameSafe(LocalPlayer),
-                      LayerName.GetTagName(),
-                      WidgetClass.ToString());
-            return nullptr;
-        }
+                  GetNameSafe(WidgetClass));
+
+        return Layout->PushWidgetToLayer(LayerName, WidgetClass);
     }
     else
     {
         UE_LOGFMT(LogBlaze,
                   Error,
-                  "PushContentToLayer{Type}"
+                  "PushContentToLayer"
                   "(LocalPlayer=[{LocalPlayer}] LayerName=[{LayerName}] WidgetClass=[{WidgetClass}]) "
                   "failed as LocalPlayer has no PrimaryLayout",
-                  bAsync ? "Async" : "",
                   GetNameSafe(LocalPlayer),
                   LayerName.GetTagName(),
-                  WidgetClass.ToString());
+                  GetNameSafe(WidgetClass));
         return nullptr;
     }
 }
@@ -138,21 +114,6 @@ UBlazeFunctionLibrary::PushContentToLayer(APlayerController* PlayerController,
                                           const TSubclassOf<UCommonActivatableWidget> WidgetClass)
 {
     return PushContentToLayer(GetLocalPlayerFromController(PlayerController), LayerName, WidgetClass);
-}
-
-UCommonActivatableWidget*
-UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
-                                          const FGameplayTag LayerName,
-                                          const TSubclassOf<UCommonActivatableWidget> WidgetClass)
-{
-    return PushContentToLayer(LocalPlayer, LayerName, TSoftClassPtr<UCommonActivatableWidget>(WidgetClass), false);
-}
-
-void UBlazeFunctionLibrary::PushContentToLayerAsync(const ULocalPlayer* LocalPlayer,
-                                                    const FGameplayTag LayerName,
-                                                    const TSoftClassPtr<UCommonActivatableWidget> WidgetClass)
-{
-    PushContentToLayer(LocalPlayer, LayerName, WidgetClass, true);
 }
 
 void UBlazeFunctionLibrary::PopContentFromLayer(const FGameplayTag LayerName,
