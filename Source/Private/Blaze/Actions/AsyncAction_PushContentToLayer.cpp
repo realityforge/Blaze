@@ -28,20 +28,33 @@ UAsyncAction_PushContentToLayer::PushContentToLayerAsync(APlayerController* Play
 {
     if (!PlayerController)
     {
+#if WITH_EDITOR
         FFrame::KismetExecutionMessage(TEXT("PushContentToLayerAsync was supplied a null PlayerController"),
                                        ELogVerbosity::Error);
+#else
+        UE_LOGFMT(LogBlaze, Error, "PushContentToLayerAsync was supplied a null PlayerController");
+#endif
+
         return nullptr;
     }
     else if (WidgetClass.IsNull())
     {
+#if WITH_EDITOR
         FFrame::KismetExecutionMessage(TEXT("PushContentToLayerAsync was supplied a null WidgetClass"),
                                        ELogVerbosity::Error);
+#else
+        UE_LOGFMT(LogBlaze, Error, "PushContentToLayerAsync was supplied a null WidgetClass");
+#endif
         return nullptr;
     }
     else if (!LayerName.IsValid())
     {
+#if WITH_EDITOR
         FFrame::KismetExecutionMessage(TEXT("PushContentToLayerAsync was supplied an invalid LayerName"),
                                        ELogVerbosity::Error);
+#else
+        UE_LOGFMT(LogBlaze, Error, "PushContentToLayerAsync was supplied an invalid LayerName");
+#endif
         return nullptr;
     }
     else if (const auto World =
