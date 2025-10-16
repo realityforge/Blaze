@@ -39,7 +39,8 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
                                           const FGameplayTag LayerName,
                                           const TSubclassOf<UCommonActivatableWidget> WidgetClass)
 {
-    if (!LocalPlayer || !WidgetClass.Get() || !LayerName.IsValid())
+    const auto ResolvedWidgetClass = WidgetClass.Get();
+    if (!LocalPlayer || !ResolvedWidgetClass || !LayerName.IsValid())
     {
         UE_LOGFMT(LogBlaze,
                   Error,
@@ -61,10 +62,10 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
                   "World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
                   LayerName.GetTagName(),
-                  GetNameSafe(WidgetClass),
+                  GetNameSafe(ResolvedWidgetClass),
                   GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
 
-        return Layout->PushWidgetToLayer(LayerName, WidgetClass);
+        return Layout->PushWidgetToLayer(LayerName, ResolvedWidgetClass);
     }
     else
     {
@@ -75,7 +76,7 @@ UBlazeFunctionLibrary::PushContentToLayer(const ULocalPlayer* LocalPlayer,
                   "failed as LocalPlayer has no PrimaryLayout. World=[{WorldName}]",
                   GetNameSafe(LocalPlayer),
                   LayerName.GetTagName(),
-                  GetNameSafe(WidgetClass),
+                  GetNameSafe(ResolvedWidgetClass),
                   GetNameSafe(LocalPlayer ? LocalPlayer->GetWorld() : nullptr));
         return nullptr;
     }
