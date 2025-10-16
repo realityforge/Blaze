@@ -23,6 +23,43 @@
 
 UBlazePrimaryLayout::UBlazePrimaryLayout(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {}
 
+void UBlazePrimaryLayout::BP_RegisterLayer(const FGameplayTag LayerTag,
+                                           UCommonActivatableWidgetContainerBase* LayerWidget)
+{
+    if (!LayerTag.IsValid())
+    {
+#if WITH_EDITOR
+        FFrame::KismetExecutionMessage(TEXT("BP_RegisterLayer was supplied an invalid LayerName"),
+                                       ELogVerbosity::Error);
+#else
+        UE_LOGFMT(LogBlaze, Error, "BP_RegisterLayer was supplied an invalid LayerName");
+#endif
+    }
+    else if (!IsValid(LayerWidget))
+    {
+#if WITH_EDITOR
+        FFrame::KismetExecutionMessage(TEXT("BP_RegisterLayer was supplied an invalid LayerWidget"),
+                                       ELogVerbosity::Error);
+#else
+        UE_LOGFMT(LogBlaze, Error, "BP_RegisterLayer was supplied an invalid LayerWidget");
+#endif
+    }
+    else if (Layers.Contains(LayerTag))
+    {
+#if WITH_EDITOR
+        FFrame::KismetExecutionMessage(TEXT("BP_RegisterLayer attempted to register a Layer with "
+                                            "a name that already exists"),
+                                       ELogVerbosity::Error);
+#else
+        UE_LOGFMT(LogBlaze, Error, "BP_RegisterLayer was supplied an invalid LayerWidget");
+#endif
+    }
+    else
+    {
+        RegisterLayer(LayerTag, LayerWidget);
+    }
+}
+
 void UBlazePrimaryLayout::RegisterLayer(const FGameplayTag LayerTag, UCommonActivatableWidgetContainerBase* LayerWidget)
 {
     // Avoid attempting to add widgets during designer as it would make it

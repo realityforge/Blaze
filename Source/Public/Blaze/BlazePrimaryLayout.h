@@ -99,8 +99,11 @@ public:
 protected:
     /** Register a layer that widgets can be pushed onto. */
     UFUNCTION(BlueprintCallable, Category = "Blaze")
-    BLAZE_API void RegisterLayer(UPARAM(meta = (Categories = "UILayersCategory")) FGameplayTag LayerTag,
-                                 UCommonActivatableWidgetContainerBase* LayerWidget);
+    void BP_RegisterLayer(UPARAM(meta = (Categories = "UILayersCategory")) FGameplayTag LayerTag,
+                          UCommonActivatableWidgetContainerBase* LayerWidget);
+
+    /** Register a layer that widgets can be pushed onto. */
+    BLAZE_API void RegisterLayer(FGameplayTag LayerTag, UCommonActivatableWidgetContainerBase* LayerWidget);
 
 private:
     /**
