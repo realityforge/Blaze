@@ -153,7 +153,7 @@ void UBlazeSubsystem::SwitchToPrimaryLayoutManager(UBlazePrimaryLayoutManager* I
     {
         UE_LOGFMT(LogBlaze,
                   Log,
-                  "SwitchToPrimaryLayoutManager - [{Name}] is switching to PrimaryLayoutManager [{Old}] from [{New}]. "
+                  "SwitchToPrimaryLayoutManager - [{Name}] is switching from PrimaryLayoutManager [{Old}] to [{New}]. "
                   "World=[{WorldName}]",
                   GetName(),
                   GetNameSafe(PrimaryLayoutManager),
