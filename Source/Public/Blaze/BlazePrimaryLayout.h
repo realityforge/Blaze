@@ -168,6 +168,20 @@ T* UBlazePrimaryLayout::PushWidgetToLayer(const FGameplayTag LayerName,
 {
     static_assert(TIsDerivedFrom<T, UCommonActivatableWidget>::IsDerived,
                   "Template type T must be derived from UCommonActivatableWidget");
-    const auto Layer = GetLayerChecked(LayerName);
-    return Layer->AddWidget<T>(const_cast<UClass*>(WidgetClass), InitInstanceFunc);
+    const auto Layer = GetLayer(LayerName);
+    if (ensureAlwaysMsgf(Layer,
+                         TEXT("PushWidgetToLayer called with unregistered layer [%s] on layout [%s]"),
+                         *LayerName.ToString(),
+                         *GetName())
+        && ensureAlwaysMsgf(WidgetClass,
+                            TEXT("PushWidgetToLayer called with null WidgetClass for layer [%s] on layout [%s]"),
+                            *LayerName.ToString(),
+                            *GetName()))
+    {
+        return Layer->AddWidget<T>(const_cast<UClass*>(WidgetClass), InitInstanceFunc);
+    }
+    else
+    {
+        return nullptr;
+    }
 }
