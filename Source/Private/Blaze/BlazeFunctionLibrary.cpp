@@ -190,7 +190,7 @@ void UBlazeFunctionLibrary::PopContentFromLayer(const FGameplayTag LayerName,
         UE_LOGFMT(LogBlaze,
                   Error,
                   "PopContentFromLayer(ActivatableWidget=[{ActivatableWidget}]) "
-                  "failed as as ActivatableWidget invalid",
+                  "failed as ActivatableWidget invalid",
                   GetNameSafe(ActivatableWidget));
     }
 }
