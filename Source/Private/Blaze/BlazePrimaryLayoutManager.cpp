@@ -108,8 +108,7 @@ void UBlazePrimaryLayoutManager::NotifyPlayerDestroyed(ULocalPlayer* LocalPlayer
 
 int UBlazePrimaryLayoutManager::GetAddLayoutToPlayerScreenZOrder(ULocalPlayer* LocalPlayer)
 {
-    constexpr int ZOrder = 1000;
-    return ZOrder;
+    return DefaultZOrder;
 }
 
 void UBlazePrimaryLayoutManager::AddPrimaryLayoutToViewport(ULocalPlayer* LocalPlayer, UBlazePrimaryLayout* Layout)
