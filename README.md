@@ -40,7 +40,7 @@ UBlazeFunctionLibrary::PushContentToLayer(PlayerController, LayerTag, WidgetClas
 UAsyncAction_PushContentToLayer::PushContentToLayerAsync(PlayerController, LayerTag, SoftWidgetClass, true);
 ```
 
-For a complete, step‑by‑step guide with inline code examples, see `docs/GettingStarted.md`.
+For a complete, step-by-step guide with inline code examples, see [`docs/GettingStarted.md`](docs/GettingStarted.md).
 
 ## Requirements
 
