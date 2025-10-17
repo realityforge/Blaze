@@ -31,7 +31,6 @@ public class Blaze : ModuleRules
             "CommonInput",
             "CommonUI",
             "GameplayTags",
-            "ModularGameplay",
         });
     }
 }

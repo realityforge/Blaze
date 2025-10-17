@@ -7,13 +7,12 @@ Blaze is a lightweight Unreal Engine plugin that helps you manage per‑player U
   - `Source/Public/Blaze/BlazePrimaryLayout.h`
   - `Source/Public/Blaze/BlazePrimaryLayoutManager.h`
   - `Source/Public/Blaze/BlazeFunctionLibrary.h`
-  - `Source/Public/Blaze/BlazePlayerControllerComponent.h`
   - `Source/Public/Blaze/Actions/AsyncAction_PushContentToLayer.h`
 
 ## Prerequisites
 
 - Unreal Engine 5.3+
-- `CommonUI` and `ModularGameplay` plugins enabled (Blaze lists them in `Blaze.uplugin` so they will be loaded when Blaze is enabled).
+- `CommonUI` plugin enabled (required)
 - Gameplay Tags enabled in your project.
 
 ## Install the Plugin
@@ -171,9 +170,9 @@ PrimaryLayoutManagerClass=/Game/MyGame/UI/BP_MyGamePrimaryLayoutManager.BP_MyGam
 
 Create the `BP_MyGamePrimaryLayoutManager` Blueprint derived from `UMyGamePrimaryLayoutManager`, and set its `PrimaryLayoutClass` to your primary layout Blueprint.
 
-## Register Players Automatically
+## Register Players
 
-Add `UBlazePlayerControllerComponent` to your PlayerController so the subsystem is notified when a local player is ready.
+Override `APlayerController::ReceivedPlayer()` in your PlayerController and notify `UBlazeSubsystem`.
 
 Header:
 
@@ -181,7 +180,6 @@ Header:
 #pragma once
 
 #include "GameFramework/PlayerController.h"
-#include "Blaze/BlazePlayerControllerComponent.h"
 #include "MyGamePlayerController.generated.h"
 
 UCLASS()
@@ -190,11 +188,7 @@ class AMyGamePlayerController : public APlayerController
     GENERATED_BODY()
 
 public:
-    AMyGamePlayerController();
-
-private:
-    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
-    TObjectPtr<UBlazePlayerControllerComponent> BlazePlayerControllerComponent{ nullptr };
+    virtual void ReceivedPlayer() override;
 };
 ```
 
@@ -202,14 +196,65 @@ Source:
 
 ```cpp
 #include "MyGamePlayerController.h"
+#include "Blaze/BlazeSubsystem.h"
 
-AMyGamePlayerController::AMyGamePlayerController()
+void AMyGamePlayerController::ReceivedPlayer()
 {
-    BlazePlayerControllerComponent = CreateDefaultSubobject<UBlazePlayerControllerComponent>(UBlazePlayerControllerComponent::NAME_DefaultName);
+    Super::ReceivedPlayer();
+
+    if (const auto Subsystem = GetGameInstance<UGameInstance>()->GetSubsystem<UBlazeSubsystem>())
+    {
+        Subsystem->OnReceivedPlayerController(this);
+    }
 }
 ```
 
-This component calls into `UBlazeSubsystem` once the player is received, ensuring each local player gets a primary layout.
+This ensures each local player gets a primary layout as soon as the controller is ready.
+
+## Optional: ModularGameplay Integration
+
+If your project uses ModularGameplay, you can implement the registration as a controller component. Below is an example component you can copy into your project and attach to your PlayerController.
+
+Header:
+
+```cpp
+#pragma once
+
+#include "Components/ControllerComponent.h"
+#include "MyGameBlazeControllerComponent.generated.h"
+
+UCLASS(meta=(BlueprintSpawnableComponent))
+class UMyGameBlazeControllerComponent : public UControllerComponent
+{
+    GENERATED_BODY()
+
+public:
+    virtual void ReceivedPlayer() override;
+};
+```
+
+Source:
+
+```cpp
+#include "MyGameBlazeControllerComponent.h"
+#include "Blaze/BlazeSubsystem.h"
+
+void UMyGameBlazeControllerComponent::ReceivedPlayer()
+{
+    if (const auto Owner = GetOwner<APlayerController>())
+    {
+        if (const auto LocalPlayer = Cast<ULocalPlayer>(Owner->Player))
+        {
+            if (const auto Subsystem = LocalPlayer->GetGameInstance()->GetSubsystem<UBlazeSubsystem>())
+            {
+                Subsystem->OnReceivedPlayerController(this);
+            }
+        }
+    }
+}
+```
+
+Attach this component to your PlayerController (Blueprint or C++). This mirrors the non‑ModularGameplay path but uses ModularGameplay’s `UControllerComponent` lifecycle.
 
 ## Using Blaze at Runtime
 

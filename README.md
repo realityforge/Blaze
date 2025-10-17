@@ -31,7 +31,7 @@ Quick setup overview:
 3. Create a subclass of `UBlazePrimaryLayout` (Blueprint or C++) and register your layer stacks with `RegisterLayer()` or `BP_RegisterLayer()`.
 4. Create a subclass of `UBlazePrimaryLayoutManager` that returns your layout in `CreatePrimaryLayout(...)` and (optionally via Blueprint) assign the layout class.
 5. Create a subclass of `UBlazeSubsystem` (for example, `UMyGameBlazeSubsystem`) and set `PrimaryLayoutManagerClass` in `DefaultGame.ini` to your manager Blueprint.
-6. Add `UBlazePlayerControllerComponent` to your PlayerController to auto-register local players.
+6. Register players by overriding `APlayerController::ReceivedPlayer()` and calling `UBlazeSubsystem::OnReceivedPlayerController`. If you use ModularGameplay, you may instead add a controller component (see docs).
 7. Push/pop content at runtime via `UBlazeFunctionLibrary` or the async action:
 
 ```c++
@@ -46,7 +46,6 @@ For a complete, step-by-step guide with inline code examples, see [`docs/Getting
 
 * Unreal Engine 5.3 or higher
 * CommonUI plugin enabled
-* ModularGameplay plugin enabled
 
 ## Authoritative Repository
 

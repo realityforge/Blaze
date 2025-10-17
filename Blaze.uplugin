@@ -24,10 +24,6 @@
     {
       "Name": "CommonUI",
       "Enabled": true
-    },
-    {
-      "Name": "ModularGameplay",
-      "Enabled": true
     }
   ]
 }
