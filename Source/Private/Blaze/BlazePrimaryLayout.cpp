@@ -94,10 +94,12 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
             if (const auto ResolvedClass = WidgetClass.Get())
             {
                 UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
-                const TFunctionRef<void(UCommonActivatableWidget&)> Func = [CallbackFunc](auto& WidgetToInit) {
-                    CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
-                };
-                if (const auto Widget = PushWidgetToLayer<UCommonActivatableWidget>(LayerName, ResolvedClass, Func))
+                if (const auto Widget = PushWidgetToLayer<UCommonActivatableWidget>(
+                        LayerName,
+                        ResolvedClass,
+                        [CallbackFunc](auto& WidgetToInit) {
+                            CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
+                        }))
                 {
                     CallbackFunc(EBlazePushWidgetToLayerState::AfterPush, Widget);
                 }
