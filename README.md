@@ -48,6 +48,14 @@ For a complete, step‑by‑step guide with inline code examples, see `docs/Gett
 * CommonUI plugin enabled
 * ModularGameplay plugin enabled
 
+## Authoritative Repository
+
+The canonical source of Blaze is maintained at:
+
+- https://github.com/realityforge/Blaze
+
+Please open issues and pull requests on the upstream repository. This plugin may be integrated into other repositories via git subtree merge or by direct download/unzip; treat those copies as downstream integrations.
+
 ## License
 
 Licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).

@@ -1,5 +1,10 @@
 # Repository Guidelines
 
+## Authoritative Repository
+The canonical source for this plugin is maintained at https://github.com/realityforge/Blaze. Please open pull requests and issues on that repository.
+
+This plugin is sometimes integrated into other repositories via git subtree merge or distributed as a direct download (unzip into `Plugins/Blaze/`). Those copies are mirrors for consumption; treat them as downstream integrations and avoid filing issues/PRs there.
+
 ## Project Structure & Module Organization
 This repository hosts the Blaze Unreal Engine plugin. `Blaze.uplugin` defines the single module, while `Source/Public` exposes headers for gameplay layers, managers, and the `UBlazeFunctionLibrary`. `Source/Private` contains implementation details and is where new native logic should live. Configuration redirects live in `Config/DefaultBlaze.ini`, and generated artifacts (for example `Binaries/` and `Intermediate/`) should stay untouched unless you are troubleshooting a local build. Blaze depends on `ModularGameplay` because `UBlazePlayerControllerComponent` derives from `UControllerComponent`, so keep that plugin enabled. Keep `README.md` aligned with new features so downstream teams stay informed.
 
