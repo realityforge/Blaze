@@ -48,6 +48,14 @@ public:
     BLAZE_API virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
     /**
+     * @brief Handles the event when a PlayerController is received.
+     *
+     * This function should be called when a PlayerController instance is received.
+     * This is typically invoked from the `UPlayerController::ReceivedPlayer` method.
+     */
+    BLAZE_API void OnReceivedPlayerController(const APlayerController* Owner);
+
+    /**
      * Notify the Subsystem that a player has been added.
      * This creates the primary layout for the player if necessary and adds the layout to
      * the player's viewport.

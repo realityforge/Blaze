@@ -25,34 +25,19 @@ void UBlazePlayerControllerComponent::ReceivedPlayer()
 {
     if (const auto Owner = GetOwner<APlayerController>())
     {
-        if (const auto LocalPlayer = Cast<ULocalPlayer>(Owner->Player))
+        if (const auto Subsystem = GetGameInstanceChecked<UGameInstance>()->GetSubsystem<UBlazeSubsystem>())
         {
-            if (const auto Subsystem = LocalPlayer->GetGameInstance()->GetSubsystem<UBlazeSubsystem>())
-            {
-                UE_LOGFMT(LogBlaze,
-                          Verbose,
-                          "UBlazePlayerControllerComponent::ReceivedPlayer({Name}) "
-                          "registering LocalPlayer in BlazeSubsystem. "
-                          "World=[{WorldName}]",
-                          Owner->GetName(),
-                          GetNameSafe(Subsystem->GetWorld()));
-
-                // The remove and then add pattern is used in case the controller component is dynamically
-                // added or removed from the controller and/or to support possession changes mid game. It also
-                // used to support hot-reloading of controller components.
-                Subsystem->NotifyPlayerRemoved(LocalPlayer);
-                Subsystem->NotifyPlayerAdded(LocalPlayer);
-            }
-            else
-            {
-                UE_LOGFMT(LogBlaze,
-                          Error,
-                          "UBlazePlayerControllerComponent::ReceivedPlayer({Name}) "
-                          "unable to locate BlazeSubsystem. Misconfigured application. "
-                          "World=[{WorldName}]",
-                          Owner->GetName(),
-                          GetNameSafe(GetWorld()));
-            }
+            Subsystem->OnReceivedPlayerController(Owner);
+        }
+        else
+        {
+            UE_LOGFMT(LogBlaze,
+                      Error,
+                      "UBlazePlayerControllerComponent::ReceivedPlayer({Name}) "
+                      "unable to locate BlazeSubsystem. Misconfigured application. "
+                      "World=[{WorldName}]",
+                      Owner->GetName(),
+                      GetNameSafe(GetWorld()));
         }
     }
 }

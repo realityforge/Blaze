@@ -101,6 +101,25 @@ bool UBlazeSubsystem::ShouldCreateSubsystem(UObject* Outer) const
     return false;
 }
 
+void UBlazeSubsystem::OnReceivedPlayerController(const APlayerController* const Owner)
+{
+    if (const auto LocalPlayer = Cast<ULocalPlayer>(Owner->Player))
+    {
+        UE_LOGFMT(LogBlaze,
+                  Verbose,
+                  "OnReceivedPlayerController(PlayerController={PlayerController}) registered in BlazeSubsystem. "
+                  "World=[{WorldName}]",
+                  Owner->GetName(),
+                  GetNameSafe(GetWorld()));
+
+        // The remove and then add pattern is used in case the controller component is dynamically
+        // added or removed from the controller and/or to support possession changes mid game. It also
+        // used to support hot-reloading of controller components.
+        NotifyPlayerRemoved(LocalPlayer);
+        NotifyPlayerAdded(LocalPlayer);
+    }
+}
+
 void UBlazeSubsystem::NotifyPlayerAdded(ULocalPlayer* LocalPlayer)
 {
     UE_LOGFMT(LogBlaze,
