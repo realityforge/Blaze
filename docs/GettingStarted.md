@@ -257,41 +257,6 @@ void ShowMenuAsync(AMyGamePlayerController* PC, TSoftClassPtr<UCommonActivatable
 }
 ```
 
-## Optional: Sync Layout Visibility with HUD
-
-If your game toggles `AHUD::bShowHUD`, you can mirror that onto the primary layout’s visibility (example inside a subsystem or manager that ticks):
-
-```cpp
-#include "Blaze/BlazeFunctionLibrary.h"
-#include "Engine/GameInstance.h"
-#include "GameFramework/HUD.h"
-#include "Containers/Ticker.h"
-
-class FMyHUDSync
-{
-public:
-    FTSTicker::FDelegateHandle Handle;
-    UGameInstance* GameInstance = nullptr;
-
-    bool Tick(float)
-    {
-        for (ULocalPlayer* LocalPlayer : GameInstance->GetLocalPlayers())
-        {
-            bool bShow = true;
-            if (APlayerController* PC = LocalPlayer->GetPlayerController(GameInstance->GetWorld()))
-            {
-                if (AHUD* HUD = PC->GetHUD()) { bShow = HUD->bShowHUD; }
-            }
-            if (UBlazePrimaryLayout* Layout = UBlazeFunctionLibrary::GetPrimaryLayout(LocalPlayer))
-            {
-                Layout->SetVisibility(bShow ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
-            }
-        }
-        return true;
-    }
-};
-```
-
 ## Verify Your Setup
 
 - On startup, `UBlazeSubsystem` should log that it loaded the `PrimaryLayoutManagerClass`. If you see “PrimaryLayoutManagerClass is null”, set it in `DefaultGame.ini`.
