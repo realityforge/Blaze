@@ -88,46 +88,53 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
         ? UBlazeFunctionLibrary::SuspendInputForPlayer(GetOwningPlayer(), NAME_PushWidgetToLayer)
         : NAME_None;
 
+    TWeakObjectPtr Self(this);
+
     auto Handle = UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
         WidgetClass.ToSoftObjectPath(),
-        FStreamableDelegate::CreateWeakLambda(this, [this, LayerName, WidgetClass, CallbackFunc, SuspendInputToken] {
-            if (const auto ResolvedClass = WidgetClass.Get())
+        FStreamableDelegate::CreateWeakLambda(this, [Self, LayerName, WidgetClass, CallbackFunc, SuspendInputToken] {
+            if (Self.IsValid())
             {
-                UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
-                if (const auto Widget = PushWidgetToLayer<UCommonActivatableWidget>(
-                        LayerName,
-                        ResolvedClass,
-                        [CallbackFunc](auto& WidgetToInit) {
-                            CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
-                        }))
+                UBlazeFunctionLibrary::ResumeInputForPlayer(Self->GetOwningPlayer(), SuspendInputToken);
+                if (const auto ResolvedClass = WidgetClass.Get())
                 {
-                    CallbackFunc(EBlazePushWidgetToLayerState::AfterPush, Widget);
+                    if (const auto Widget = Self->PushWidgetToLayer<UCommonActivatableWidget>(
+                            LayerName,
+                            ResolvedClass,
+                            [CallbackFunc](auto& WidgetToInit) {
+                                CallbackFunc(EBlazePushWidgetToLayerState::Initialize, &WidgetToInit);
+                            }))
+                    {
+                        CallbackFunc(EBlazePushWidgetToLayerState::AfterPush, Widget);
+                    }
+                    else
+                    {
+                        UE_LOGFMT(LogBlaze,
+                                  Warning,
+                                  "PushWidgetToLayerAsync"
+                                  "((Layout=[{Layout}] Layer=[{LayerName}] WidgetClass=[{WidgetClass}])) "
+                                  "failed because the layer was not available or widget creation failed. "
+                                  "World=[{WorldName}]",
+                                  Self->GetName(),
+                                  LayerName.GetTagName(),
+                                  GetNameSafe(ResolvedClass),
+                                  GetNameSafe(Self->GetWorld()));
+                        CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
+                    }
                 }
                 else
                 {
-                    UE_LOGFMT(LogBlaze,
-                              Warning,
-                              "PushWidgetToLayerAsync"
-                              "((Layout=[{Layout}] Layer=[{LayerName}] WidgetClass=[{WidgetClass}])) "
-                              "failed because the layer was not available or widget creation failed. "
-                              "World=[{WorldName}]",
-                              GetName(),
-                              LayerName.GetTagName(),
-                              GetNameSafe(ResolvedClass),
-                              GetNameSafe(GetWorld()));
                     CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
                 }
             }
-            else
-            {
-                UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
-                CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
-            }
         }));
 
-    Handle->BindCancelDelegate(FStreamableDelegate::CreateWeakLambda(this, [this, CallbackFunc, SuspendInputToken]() {
-        UBlazeFunctionLibrary::ResumeInputForPlayer(GetOwningPlayer(), SuspendInputToken);
-        CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
+    Handle->BindCancelDelegate(FStreamableDelegate::CreateWeakLambda(this, [Self, CallbackFunc, SuspendInputToken]() {
+        if (Self.IsValid())
+        {
+            UBlazeFunctionLibrary::ResumeInputForPlayer(Self->GetOwningPlayer(), SuspendInputToken);
+            CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
+        }
     }));
 
     return Handle;
