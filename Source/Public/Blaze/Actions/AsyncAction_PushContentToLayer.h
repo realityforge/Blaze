@@ -28,7 +28,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPushContentToLayerAsyncSignature, U
  * Asynchronous action class for pushing a widget onto a specified UI layer.
  */
 UCLASS(MinimalAPI, BlueprintType)
-class UAsyncAction_PushContentToLayer : public UCancellableAsyncAction
+class UAsyncAction_PushContentToLayer final : public UCancellableAsyncAction
 {
     GENERATED_BODY()
 
