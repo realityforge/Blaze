@@ -50,7 +50,7 @@ public:
     FPushContentToLayerAsyncSignature AfterPush;
 
     /**
-     * Event invoked if the push operation has been canceled.
+     * Event invoked if the operation has been canceled.
      */
     UPROPERTY(BlueprintAssignable)
     FPushContentToLayerAsyncSignature OnCancelled;
