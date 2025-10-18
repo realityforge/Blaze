@@ -16,10 +16,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine/AssetManager.h"
-#include "Engine/Engine.h"
-#include "Engine/GameInstance.h"
 #include "Engine/StreamableManager.h"
-#include "UObject/Stack.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AsyncAction_CreateWidgetAsync)
 
