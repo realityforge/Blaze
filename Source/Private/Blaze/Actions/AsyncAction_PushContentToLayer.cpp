@@ -89,7 +89,7 @@ void UAsyncAction_PushContentToLayer::Activate()
 {
     if (const auto Layout = UBlazeFunctionLibrary::GetPrimaryLayout(PlayerController.Get()))
     {
-        TWeakObjectPtr Self = this;
+        TWeakObjectPtr Self(this);
 
         Handle = Layout->PushWidgetToLayerAsync<UCommonActivatableWidget>(
             LayerName,
