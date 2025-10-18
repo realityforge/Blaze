@@ -150,4 +150,5 @@ private:
     static UBlazePrimaryLayoutManager* GetPrimaryLayoutManager(const UGameInstance* GameInstance);
 
     friend class UBlazePrimaryLayout;
+    friend class UAsyncAction_CreateWidgetAsync;
 };
