@@ -77,51 +77,49 @@ void UAsyncAction_CreateWidgetAsync::Cancel()
 
 void UAsyncAction_CreateWidgetAsync::Activate()
 {
-    static const FName NAME_CreateWidgetAsync = FName("CreatingWidgetAsync");
-    const auto PlayerController = OwningPlayer.Get();
+    static const auto NAME_CreateWidgetAsync = FName("CreatingWidgetAsync");
+    const TWeakObjectPtr<APlayerController> WeakPlayer = OwningPlayer;
     const auto SuspendInputToken = bSuspendInputUntilComplete
-        ? UBlazeFunctionLibrary::SuspendInputForPlayer(PlayerController, NAME_CreateWidgetAsync)
+        ? UBlazeFunctionLibrary::SuspendInputForPlayer(WeakPlayer.Get(), NAME_CreateWidgetAsync)
         : NAME_None;
 
     TWeakObjectPtr Self(this);
 
     Handle = UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
         WidgetClass.ToSoftObjectPath(),
-        FStreamableDelegate::CreateWeakLambda(
-            this,
-            [Self, PlayerController, SuspendInputToken] {
-                if (PlayerController)
-                {
-                    UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
-                }
-                if (Self.IsValid())
-                {
-                    if (const auto ResolvedClass = Self->WidgetClass.Get())
-                    {
-                        // This next line deliberately re-resolves OwningPlayer
-                        // ... which will return null if no longer valid
-                        const auto Widget =
-                            UWidgetBlueprintLibrary::Create(Self->World.Get(), ResolvedClass, Self->OwningPlayer.Get());
-                        Self->OnComplete.Broadcast(Widget);
-                    }
-                    else
-                    {
-                        Self->OnCancelled.Broadcast();
-                    }
-                    Self->SetReadyToDestroy();
-                }
-            }),
-        FStreamableManager::AsyncLoadHighPriority);
-
-    Handle->BindCancelDelegate(
-        FStreamableDelegate::CreateWeakLambda(this, [Self, PlayerController, SuspendInputToken]() {
-            if (PlayerController)
+        FStreamableDelegate::CreateLambda([Self, WeakPlayer, SuspendInputToken]() {
+            if (const auto PlayerController = WeakPlayer.Get())
             {
                 UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
             }
             if (Self.IsValid())
             {
-                Self->OnCancelled.Broadcast();
+                if (const auto ResolvedClass = Self->WidgetClass.Get())
+                {
+                    const auto Widget =
+                        UWidgetBlueprintLibrary::Create(Self->World.Get(), ResolvedClass, WeakPlayer.Get());
+                    Self->OnComplete.Broadcast(Widget);
+                }
+                else
+                {
+                    Self->OnCancelled.Broadcast();
+                }
+                Self->SetReadyToDestroy();
+                Self->Handle.Reset();
             }
-        }));
+        }),
+        FStreamableManager::AsyncLoadHighPriority);
+
+    Handle->BindCancelDelegate(FStreamableDelegate::CreateLambda([Self, WeakPlayer, SuspendInputToken]() {
+        if (const auto PlayerController = WeakPlayer.Get())
+        {
+            UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
+        }
+        if (Self.IsValid())
+        {
+            Self->OnCancelled.Broadcast();
+            Self->SetReadyToDestroy();
+            Self->Handle.Reset();
+        }
+    }));
 }
