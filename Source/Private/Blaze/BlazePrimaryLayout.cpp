@@ -83,19 +83,23 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
     const TSoftClassPtr<UCommonActivatableWidget>& WidgetClass,
     TFunction<void(EBlazePushWidgetToLayerState, UCommonActivatableWidget*)> CallbackFunc)
 {
-    static const FName NAME_PushWidgetToLayer("PushWidgetToLayer");
+    static const auto NAME_PushWidgetToLayer("PushWidgetToLayer");
+    const TWeakObjectPtr WeakPlayer = GetOwningPlayer();
     const auto SuspendInputToken = bSuspendInputUntilComplete
-        ? UBlazeFunctionLibrary::SuspendInputForPlayer(GetOwningPlayer(), NAME_PushWidgetToLayer)
+        ? UBlazeFunctionLibrary::SuspendInputForPlayer(WeakPlayer.Get(), NAME_PushWidgetToLayer)
         : NAME_None;
 
     TWeakObjectPtr Self(this);
 
     auto Handle = UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
         WidgetClass.ToSoftObjectPath(),
-        FStreamableDelegate::CreateWeakLambda(this, [Self, LayerName, WidgetClass, CallbackFunc, SuspendInputToken] {
+        FStreamableDelegate::CreateLambda([Self, WeakPlayer, LayerName, WidgetClass, CallbackFunc, SuspendInputToken] {
+            if (const auto PlayerController = WeakPlayer.Get())
+            {
+                UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
+            }
             if (Self.IsValid())
             {
-                UBlazeFunctionLibrary::ResumeInputForPlayer(Self->GetOwningPlayer(), SuspendInputToken);
                 if (const auto ResolvedClass = WidgetClass.Get())
                 {
                     if (const auto Widget = Self->PushWidgetToLayer<UCommonActivatableWidget>(
@@ -129,10 +133,13 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
             }
         }));
 
-    Handle->BindCancelDelegate(FStreamableDelegate::CreateWeakLambda(this, [Self, CallbackFunc, SuspendInputToken]() {
+    Handle->BindCancelDelegate(FStreamableDelegate::CreateLambda([Self, WeakPlayer, CallbackFunc, SuspendInputToken]() {
+        if (const auto PlayerController = WeakPlayer.Get())
+        {
+            UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
+        }
         if (Self.IsValid())
         {
-            UBlazeFunctionLibrary::ResumeInputForPlayer(Self->GetOwningPlayer(), SuspendInputToken);
             CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
         }
     }));
