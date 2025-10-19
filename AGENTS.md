@@ -20,6 +20,8 @@ This plugin is sometimes integrated into other repositories via git subtree merg
 - Use type deduction (for example, `auto`) when it keeps intent clear and remains within Unreal Engine 5.6’s supported C++ feature set.
 - Place new public headers under `Source/<Module>/Public/<Module>/` and implementation files under the matching `Private` path.
 - Prefer UE logging macros with the `LogBlaze` category; declare new categories in module `Private` headers when needed.
+- Keep includes ordered and minimal; prefer forward declarations in headers.
+- Match existing code style when not covered by the above rules.
 
 ## Testing Guidelines
 - Automation coverage is aspirational. Capture edge cases in unit-style specs once a testing harness lands under `Source/<Module>/Private/Tests/`.
