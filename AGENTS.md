@@ -6,10 +6,26 @@ The canonical source for this plugin is maintained at https://github.com/reality
 This plugin is sometimes integrated into other repositories via git subtree merge or distributed as a direct download (unzip into `Plugins/Blaze/`). Those copies are mirrors for consumption; treat them as downstream integrations and avoid filing issues/PRs there.
 
 ## Project Structure & Module Organization
-This repository hosts the Blaze Unreal Engine plugin. `Blaze.uplugin` defines the single module, while `Source/Public` exposes headers for gameplay layers, managers, and the `UBlazeFunctionLibrary`. `Source/Private` contains implementation details and is where new native logic should live. Generated artifacts (for example `Binaries/` and `Intermediate/`) should stay untouched unless you are troubleshooting a local build. Integration uses `APlayerController::ReceivedPlayer()`. Keep `README.md` aligned with new features so downstream teams stay informed.
+- `Blaze.uplugin` declares a single module; the module sits under `Source/Public` and `Source/Private` so shared headers stay isolated from implementation-only details.
+- Core gameplay helpers live in `Source/Aeon`, AI behaviors in `Source/AeonAI`, animation utilities in `Source/AeonAnimation`, and editor-only tooling in `Source/AeonEditor`.
+- Raw files (such as `.csv` files) from which Unreal assets are imported belong in `SourceContent`, while `Content` is reserved for runtime assets that ship with the plugin.
+- Generated binaries and build artifacts should stay out of version control and should stay untouched unless you are troubleshooting a local build.
+- Keep `README.md` aligned with new features so downstream teams stay informed.
+
+## Tooling & Engine Version
+- Target Unreal Engine 5.6 for both development and verification; earlier engine releases are unsupported.
 
 ## Coding Style & Naming Conventions
-Follow Epic’s C++ style: four-space indentation, PascalCase for classes (`UBlazePrimaryLayout`), camelCase for member functions, and lowercase with underscores for local variables where Unreal guidelines allow it. Use type deduction (for example, `auto`) when it keeps intent clear and remains within Unreal Engine 5.6’s supported C++ feature set. Keep public APIs header-only in `Source/Public` and minimize includes by using forward declarations. When touching Blueprint-exposed types, ensure metadata specifiers stay alphabetized and reflect the runtime behavior. Honor line endings tracked in `.gitattributes` so headers, sources, and Markdown stay on the native EOLs the repository enforces. Run your IDE’s clang-format profile if available, and never commit trailing whitespace or BOMs in new files.
+- Follow Unreal Engine defaults: 4-space indentation, PascalCase types, camelCase locals, `FBlaze*` for structs, `UBlaze*` for UObject classes, and `EBlaze*` for enums.
+- Use type deduction (for example, `auto`) when it keeps intent clear and remains within Unreal Engine 5.6’s supported C++ feature set.
+- Place new public headers under `Source/<Module>/Public/<Module>/` and implementation files under the matching `Private` path.
+- Prefer UE logging macros with the `LogBlaze` category; declare new categories in module `Private` headers when needed.
+
+## Testing Guidelines
+- Automation coverage is aspirational. Capture edge cases in unit-style specs once a testing harness lands under `Source/<Module>/Private/Tests/`.
+- Until formal suites exist, document manual reproduction steps or sample maps in the pull request so reviewers can exercise the change.
 
 ## Commit & Pull Request Guidelines
-Use imperative commit subjects under 50 characters. Describe intent  and motivation after the subject before summarizing changes.
+- Write imperative, present-tense commit messages under 72 characters, mirroring existing history such as “Add accessor for AeonAbilitySystemComponent”.
+- Squash noisy work-in-progress commits locally; each change should stand on its own.
+- Open pull requests with a clear summary, reproduction or test notes, and screenshots or GIFs when changes impact in-editor UX.
