@@ -15,8 +15,6 @@ reasonable alternatives.
 ## Project Structure & Module Organization
 
 - `Blaze.uplugin` declares a single module; the module sits under `Source/Public` and `Source/Private` so shared headers stay isolated from implementation-only details.
-- Core gameplay helpers live in `Source/Aeon`, AI behaviors in `Source/AeonAI`, animation utilities in `Source/AeonAnimation`, and editor-only tooling in `Source/AeonEditor`.
-- Raw files (such as `.csv` files) from which Unreal assets are imported belong in `SourceContent`, while `Content` is reserved for runtime assets that ship with the plugin.
 - Generated binaries and build artifacts should stay out of version control and should stay untouched unless you are troubleshooting a local build.
 - Keep `README.md` aligned with new features so downstream teams stay informed.
 
