@@ -28,6 +28,6 @@ This plugin is sometimes integrated into other repositories via git subtree merg
 - Until formal suites exist, document manual reproduction steps or sample maps in the pull request so reviewers can exercise the change.
 
 ## Commit & Pull Request Guidelines
-- Write imperative, present-tense commit messages under 72 characters, mirroring existing history such as “Add accessor for AeonAbilitySystemComponent”.
+- Write imperative, present-tense commit messages under 72 characters.
 - Squash noisy work-in-progress commits locally; each change should stand on its own.
 - Open pull requests with a clear summary, reproduction or test notes, and screenshots or GIFs when changes impact in-editor UX.
