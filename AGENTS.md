@@ -5,6 +5,12 @@ The canonical source for this plugin is maintained at https://github.com/reality
 
 This plugin is sometimes integrated into other repositories via git subtree merge or distributed as a direct download (unzip into `Plugins/Blaze/`). Those copies are mirrors for consumption; treat them as downstream integrations and avoid filing issues/PRs there.
 
+## User Interaction
+
+When asked to perform a task, ask the user questions one at a time until you have enough context. Feel free to make
+reasonable assumptions based on patterns present in the code and ask the user to confirm the assumptions if there are
+reasonable alternatives.
+
 ## Project Structure & Module Organization
 - `Blaze.uplugin` declares a single module; the module sits under `Source/Public` and `Source/Private` so shared headers stay isolated from implementation-only details.
 - Core gameplay helpers live in `Source/Aeon`, AI behaviors in `Source/AeonAI`, animation utilities in `Source/AeonAnimation`, and editor-only tooling in `Source/AeonEditor`.
