@@ -173,7 +173,7 @@ void UBlazePrimaryLayoutManager::RemovePrimaryLayoutFromViewport(ULocalPlayer* L
         {
             UE_LOGFMT(LogBlaze,
                       Warning,
-                      "[{LayoutManager}]: The primary layout [{PrimaryLayout}] has been removed"
+                      "[{LayoutManager}]: The primary layout [{PrimaryLayout}] has been removed "
                       "from the viewport for the player [{LocalPlayer}](ControllerId={ControllerId}) "
                       "but references to the underlying widget still exist. "
                       "World=[{WorldName}]",
