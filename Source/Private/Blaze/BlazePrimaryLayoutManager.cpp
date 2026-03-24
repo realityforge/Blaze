@@ -155,8 +155,9 @@ void UBlazePrimaryLayoutManager::AddPrimaryLayoutToViewport(ULocalPlayer* LocalP
 
 void UBlazePrimaryLayoutManager::RemovePrimaryLayoutFromViewport(ULocalPlayer* LocalPlayer, UBlazePrimaryLayout* Layout)
 {
-    const auto Widget = Layout->GetCachedWidget();
-    if (Widget.IsValid())
+    // Avoid extending the Slate widget lifetime while checking whether RemoveFromParent detached it.
+    const TWeakPtr<SWidget> WeakWidget = Layout->GetCachedWidget();
+    if (WeakWidget.IsValid())
     {
         UE_LOGFMT(LogBlaze,
                   Log,
@@ -169,13 +170,13 @@ void UBlazePrimaryLayoutManager::RemovePrimaryLayoutFromViewport(ULocalPlayer* L
                   LocalPlayer ? LocalPlayer->GetControllerId() : -1,
                   GetNameSafe(GetWorld()));
         Layout->RemoveFromParent();
-        if (Widget.IsValid())
+        if (const auto ReleasedWidget = WeakWidget.Pin();
+            ReleasedWidget.IsValid() && ReleasedWidget->GetParentWidget().IsValid())
         {
             UE_LOGFMT(LogBlaze,
                       Warning,
-                      "[{LayoutManager}]: The primary layout [{PrimaryLayout}] has been removed "
-                      "from the viewport for the player [{LocalPlayer}](ControllerId={ControllerId}) "
-                      "but references to the underlying widget still exist. "
+                      "[{LayoutManager}]: The primary layout [{PrimaryLayout}] still has a Slate parent "
+                      "after RemoveFromParent() for player [{LocalPlayer}](ControllerId={ControllerId}). "
                       "World=[{WorldName}]",
                       GetName(),
                       GetNameSafe(Layout),
