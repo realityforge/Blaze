@@ -13,7 +13,19 @@
  */
 #include "Blaze.h"
 
-void FBlazeModule::StartupModule() {}
+#if WITH_DEV_AUTOMATION_TESTS
+namespace BlazeAsyncLoadTests
+{
+    void ForceLinkAsyncLoadTests();
+}
+#endif
+
+void FBlazeModule::StartupModule()
+{
+#if WITH_DEV_AUTOMATION_TESTS
+    BlazeAsyncLoadTests::ForceLinkAsyncLoadTests();
+#endif
+}
 
 void FBlazeModule::ShutdownModule() {}
 

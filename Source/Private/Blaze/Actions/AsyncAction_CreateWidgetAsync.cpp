@@ -72,6 +72,23 @@ void UAsyncAction_CreateWidgetAsync::Cancel()
     }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void UAsyncAction_CreateWidgetAsync::OnCancel(const TWeakObjectPtr<APlayerController> WeakPlayer,
+                                              const FName SuspendInputToken,
+                                              const TWeakObjectPtr<UAsyncAction_CreateWidgetAsync> Self)
+{
+    if (const auto PlayerController = WeakPlayer.Get())
+    {
+        UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
+    }
+    if (Self.IsValid())
+    {
+        Self->OnCancelled.Broadcast();
+        Self->SetReadyToDestroy();
+        Self->Handle.Reset();
+    }
+}
+
 void UAsyncAction_CreateWidgetAsync::Activate()
 {
     static const auto NAME_CreateWidgetAsync = FName("CreatingWidgetAsync");
@@ -84,7 +101,7 @@ void UAsyncAction_CreateWidgetAsync::Activate()
 
     Handle = UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(
         WidgetClass.ToSoftObjectPath(),
-        FStreamableDelegate::CreateLambda([Self, WeakPlayer, SuspendInputToken]() {
+        FStreamableDelegate::CreateLambda([Self, WeakPlayer, SuspendInputToken] {
             if (const auto PlayerController = WeakPlayer.Get())
             {
                 UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
@@ -107,16 +124,13 @@ void UAsyncAction_CreateWidgetAsync::Activate()
         }),
         FStreamableManager::AsyncLoadHighPriority);
 
-    Handle->BindCancelDelegate(FStreamableDelegate::CreateLambda([Self, WeakPlayer, SuspendInputToken]() {
-        if (const auto PlayerController = WeakPlayer.Get())
-        {
-            UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
-        }
-        if (Self.IsValid())
-        {
-            Self->OnCancelled.Broadcast();
-            Self->SetReadyToDestroy();
-            Self->Handle.Reset();
-        }
-    }));
+    if (!Handle.IsValid())
+    {
+        OnCancel(WeakPlayer, SuspendInputToken, Self);
+    }
+    else
+    {
+        Handle->BindCancelDelegate(FStreamableDelegate::CreateLambda(
+            [this, Self, WeakPlayer, SuspendInputToken] { OnCancel(WeakPlayer, SuspendInputToken, Self); }));
+    }
 }

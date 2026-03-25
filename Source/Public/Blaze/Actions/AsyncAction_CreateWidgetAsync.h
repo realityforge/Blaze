@@ -21,6 +21,9 @@ class APlayerController;
 struct FStreamableHandle;
 class UUserWidget;
 class UWorld;
+#if WITH_DEV_AUTOMATION_TESTS
+class FBlazeTestAsyncActionCreateWidgetAsyncFactory;
+#endif
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreateWidgetAsyncOnSuccessSignature, UUserWidget*, UserWidget);
 
@@ -33,6 +36,10 @@ UCLASS(MinimalAPI, BlueprintType)
 class UAsyncAction_CreateWidgetAsync final : public UCancellableAsyncAction
 {
     GENERATED_BODY()
+
+#if WITH_DEV_AUTOMATION_TESTS
+    friend class FBlazeTestAsyncActionCreateWidgetAsyncFactory;
+#endif
 
 public:
     BLAZE_API virtual void Activate() override;
@@ -82,4 +89,8 @@ private:
     bool bSuspendInputUntilComplete{ false };
 
     TSharedPtr<FStreamableHandle> Handle;
+
+    void OnCancel(TWeakObjectPtr<APlayerController> WeakPlayer,
+                  FName SuspendInputToken,
+                  TWeakObjectPtr<UAsyncAction_CreateWidgetAsync> Self);
 };

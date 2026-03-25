@@ -143,6 +143,11 @@ private:
         bool bSuspendInputUntilComplete,
         const TSoftClassPtr<UCommonActivatableWidget>& WidgetClass,
         TFunction<void(EBlazePushWidgetToLayerState, UCommonActivatableWidget*)> CallbackFunc);
+
+    void OnCancel(TWeakObjectPtr<UBlazePrimaryLayout> Self,
+                  TWeakObjectPtr<APlayerController> WeakPlayer,
+                  const TFunction<void(EBlazePushWidgetToLayerState, UCommonActivatableWidget*)>& CallbackFunc,
+                  FName SuspendInputToken);
 };
 
 template <typename T>

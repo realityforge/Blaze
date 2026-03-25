@@ -77,6 +77,23 @@ void UBlazePrimaryLayout::RegisterLayer(const FGameplayTag LayerTag, UCommonActi
     }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void UBlazePrimaryLayout::OnCancel(
+    const TWeakObjectPtr<UBlazePrimaryLayout> Self,
+    const TWeakObjectPtr<APlayerController> WeakPlayer,
+    const TFunction<void(EBlazePushWidgetToLayerState, UCommonActivatableWidget*)>& CallbackFunc,
+    const FName SuspendInputToken)
+{
+    if (const auto PlayerController = WeakPlayer.Get())
+    {
+        UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
+    }
+    if (Self.IsValid())
+    {
+        CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
+    }
+}
+
 TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_Internal(
     const FGameplayTag& LayerName,
     const bool bSuspendInputUntilComplete,
@@ -133,16 +150,18 @@ TSharedPtr<FStreamableHandle> UBlazePrimaryLayout::PushWidgetToLayerStackAsync_I
             }
         }));
 
-    Handle->BindCancelDelegate(FStreamableDelegate::CreateLambda([Self, WeakPlayer, CallbackFunc, SuspendInputToken]() {
-        if (const auto PlayerController = WeakPlayer.Get())
-        {
-            UBlazeFunctionLibrary::ResumeInputForPlayer(PlayerController, SuspendInputToken);
-        }
-        if (Self.IsValid())
-        {
-            CallbackFunc(EBlazePushWidgetToLayerState::Canceled, nullptr);
-        }
-    }));
+    if (!Handle.IsValid())
+    {
+        OnCancel(Self, WeakPlayer, CallbackFunc, SuspendInputToken);
+        return nullptr;
+    }
+    else
+    {
+        Handle->BindCancelDelegate(
+            FStreamableDelegate::CreateLambda([this, Self, WeakPlayer, CallbackFunc, SuspendInputToken] {
+                OnCancel(Self, WeakPlayer, CallbackFunc, SuspendInputToken);
+            }));
+    }
 
     return Handle;
 }
