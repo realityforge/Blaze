@@ -85,7 +85,7 @@ namespace BlazeAsyncLoadTests
 } // namespace BlazeAsyncLoadTests
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FBlazeCreateWidgetAsyncCancelsWhenLoadHandleInvalidTest,
-                                 "Shokada.Blaze.CreateWidgetAsync.CancelsWhenLoadHandleInvalid",
+                                 "Blaze.CreateWidgetAsync.CancelsWhenLoadHandleInvalid",
                                  BlazeAsyncLoadTests::AutomationTestFlags)
 bool FBlazeCreateWidgetAsyncCancelsWhenLoadHandleInvalidTest::RunTest(const FString&)
 {
@@ -141,7 +141,7 @@ bool FBlazeCreateWidgetAsyncCancelsWhenLoadHandleInvalidTest::RunTest(const FStr
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FBlazePrimaryLayoutCancelsWhenLoadHandleInvalidTest,
-                                 "Shokada.Blaze.PrimaryLayout.CancelsWhenLoadHandleInvalid",
+                                 "Blaze.PrimaryLayout.CancelsWhenLoadHandleInvalid",
                                  BlazeAsyncLoadTests::AutomationTestFlags)
 bool FBlazePrimaryLayoutCancelsWhenLoadHandleInvalidTest::RunTest(const FString&)
 {
