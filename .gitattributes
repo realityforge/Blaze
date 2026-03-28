@@ -7,5 +7,6 @@ LICENSE text eol=native
 *.h text eol=native
 *.cs text eol=native
 *.cpp text eol=native
+*.py text eol=native
 
 *.uplugin text eol=native
