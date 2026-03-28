@@ -96,14 +96,15 @@ def cpp_includes_header(text: str, base: str) -> bool:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument(
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
         "--root",
         type=Path,
         default=Path(__file__).resolve().parent.parent,
         help="Plugin root (defaults to repository root containing Source/)",
     )
-    args = ap.parse_args()
+    parser.add_argument("--verbose", action="store_true", help="Print verbose message logs.")
+    args = parser.parse_args()
 
     plugin_root: Path = args.root
     source_root: Path = plugin_root / "Source"
@@ -113,7 +114,8 @@ def main() -> int:
 
     headers = find_generated_headers(source_root)
     if not headers:
-        print("OK: No headers include any *.generated.h; nothing to check.")
+        if args.verbose:
+            print("OK: No headers include any *.generated.h; nothing to check.")
         return 0
 
     cpp_files = list_cpp_files(source_root)
@@ -155,7 +157,8 @@ def main() -> int:
         print("Generated-include check failed:\n" + "\n".join("- " + v for v in violations))
         return 1
 
-    print("OK: All inline-generated includes present and correctly ordered.")
+    if args.verbose:
+        print("OK: All inline-generated includes present and correctly ordered.")
     return 0
 
 
