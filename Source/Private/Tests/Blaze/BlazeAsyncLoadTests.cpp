@@ -104,6 +104,10 @@ bool FBlazeCreateWidgetAsyncCancelsWhenLoadHandleInvalidTest::RunTest(const FStr
                     NewObject<UBlazeAutomationTestCreateWidgetListener>(GetTransientPackage(), NAME_None, RF_Transient);
                 if (TestNotNull(TEXT("Listener should be created"), Listener))
                 {
+                    AddExpectedMessagePlain(TEXT("ResumeInputForPlayer("),
+                                            ELogVerbosity::Warning,
+                                            EAutomationExpectedMessageFlags::Contains,
+                                            1);
                     Action->OnComplete.AddDynamic(Listener, &UBlazeAutomationTestCreateWidgetListener::HandleComplete);
                     Action->OnCancelled.AddDynamic(Listener,
                                                    &UBlazeAutomationTestCreateWidgetListener::HandleCancelled);
