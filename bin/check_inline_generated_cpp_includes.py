@@ -27,7 +27,6 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
 
-
 HEADER_GENERATED_INCLUDE_RE = re.compile(r"^\s*#\s*include\s*[\"<]([^\">]+)\.generated\.h[\">]", re.MULTILINE)
 CPP_INCLUDE_RE = re.compile(r"^\s*#\s*include\b.*", re.MULTILINE)
 CPP_INLINE_GEN_PREFIX_RE = re.compile(r"^\s*#\s*include\s+UE_INLINE_GENERATED_CPP_BY_NAME\(.*\)\s*$")
